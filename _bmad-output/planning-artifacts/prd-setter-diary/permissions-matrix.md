@@ -4,8 +4,8 @@ All access is scoped to the team being viewed. Team administration belongs to te
 
 | User | Can log | Can view |
 | --- | --- | --- |
-| Setter | Their own sets, with full detail; their own sessions (players involved, positions) | Their own diary only: progress across their hitters and set types, including each hitter's overall rating of their sets. Never another setter's diary |
-| Hitter (teammate) | One overall 0–3 rating per session for the sets they received from that setter | Own progress (v1: quality of sets they received); each team setter's consistency trend; own row of each setter's hitter × set-type grid. Never other hitters' data |
+| Setter | Their own sets, with full detail; their own sessions (players involved, positions) | Their own diary only: progress across their hitters and set types, including each hitter's rating mix of their sets. Never another setter's diary |
+| Hitter (teammate) | One rating mix per session for the sets they received from that setter (Never / Rarely / Sometimes / Mostly per rating 0–3) | Own progress (v1: quality of sets they received); each team setter's consistency trend; own row of each setter's hitter × set-type grid. Never other hitters' data |
 | Team manager (any member, on top of their role) | Team roster and invite links; members' setter and hitter roles; set-type list; grant or revoke team-wide view; make other members managers | As their role, plus the roster |
 | Member with team-wide view (setter or hitter) | As their role | All of their team's stats: every setter's diary and every hitter's data |
 | Setter, AI discussion (FR-14) | Start and continue own AI discussions (2 new per day) | Own AI conversations only. No one else, including team-wide view holders, can see them |

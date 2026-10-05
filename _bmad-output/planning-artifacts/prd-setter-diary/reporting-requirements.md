@@ -15,4 +15,4 @@ Trend and grid are per setter. A hitter viewing a grid sees only their own row; 
 | View | Shows |
 | --- | --- |
 | Pass-quality breakdown | How set quality holds up off good, OK and poor passes |
-| Setter vs hitter ratings | Where a hitter's overall rating and the setter's average for that hitter disagree, and by how much |
+| Setter vs hitter ratings | Where a hitter's rating mix and the setter's logged mix for that hitter disagree, and by how much |

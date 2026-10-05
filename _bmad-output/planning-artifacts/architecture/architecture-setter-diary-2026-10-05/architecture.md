@@ -152,7 +152,7 @@ Slices: `teams` (teams, members, flags, invites, set types, team settings), `ses
 - **Binds:** FR-5, FR-6
 - **Prevents:** a hitter's opinion replacing setter data, and features disagreeing about whether a rating is still open.
 - **Rule:**
-  - Setter per-set ratings live only in `set_entries`, written only by the session's setter. Hitter ratings live only in `hitter_session_ratings`, unique per (session, hitter), written only by that hitter.
+  - Setter per-set ratings live only in `set_entries`, written only by the session's setter. Hitter ratings live only in `hitter_session_ratings`, unique per (session, hitter), written only by that hitter; each row holds a frequency (`never | rarely | sometimes | mostly`) for each rating 0–3, at least one above `never`. Any single-number summary is derived in progress (AD-17).
   - A member may rate session S when they are an active participant of S and not its setter.
   - The lock is **derived on read, never stored**: S's rating is locked once sessions' `nextSessionWith(scope, setterId, hitterId, after: S)` returns a session, ordered by `(session_date, created_at, id)`.
   - The "To rate" list is computed only by ratings and served from `GET /api/me/ratings/pending` (across the user's teams via `UserScope`). Web and notifications consume it and never compute it.
@@ -166,7 +166,7 @@ Slices: `teams` (teams, members, flags, invites, set types, team settings), `ses
   - **Models:** exact Workers AI model IDs are configuration (`AI_MODEL_PRIMARY`, `AI_MODEL_FALLBACK`), chosen by a quality bake-off on a real stats summary among current, non-deprecated models (candidates: Gemma 4 26B, GLM 4.7-Flash, gpt-oss-20b/120b, Llama 3.3 70B fp8-fast). The fallback is the cheaper model; the model fallback is implemented in the adapter, not by AI Gateway. AI Gateway request and response body logging is turned off.
   - **Input:** built by `progress` (AD-17) with an `excludeMembers` set: members without recorded AI consent stay inside the setter's aggregate totals but never appear as a per-hitter row or label. Member names are replaced by labels ("Hitter A"). The requesting setter must hold AI consent (`CONSENT_REQUIRED`).
   - **Storage:** `ai_conversations` carry `team_id`, `owner_user_id` and `member_id`; reading requires `owner_user_id = session user` and the current TeamScope's team. Messages are stored **with labels** plus a per-conversation `label → member_id` map; names are restored only when displayed, via `teams.getMembers`. No member name is persisted outside `members`. Leaving a team deletes that user's conversations for that team.
-  - **Quota:** a discussion is a new conversation; follow-ups are capped at `AI_MAX_TURNS` per conversation. Limit: 2 new discussions per **user** per UTC day across teams, counted with a conditional `UPDATE ... WHERE count < limit` before the model call and refunded on provider error. App-wide usage is one `ai_usage_daily` row of estimated neurons; the gateway reads it to fall back from the large to the small model, then returns `limit_app`. Results are typed `{ status: 'ok' | 'limit_user' | 'limit_app' }`, not errors.
+  - **Quota:** a discussion is a new conversation; follow-ups are capped at `AI_MAX_TURNS` per conversation. Limit:pass quality `good | ok | poor`; rating `0 | 1 | 2 | 3`; frequency `never | rarely | sometimes | mostly`;new discussions per **user** per UTC day across teams, counted with a conditional `UPDATE ... WHERE count < limit` before the model call and refunded on provider error. App-wide usage is one `ai_usage_daily` row of estimated neurons; the gateway reads it to fall back from the large to the small model, then returns `limit_app`. Results are typed `{ status: 'ok' | 'limit_user' | 'limit_app' }`, not errors.
 
 ### AD-11 — Identity is an adapter; v1 is passwordless [ADOPTED]
 
@@ -239,8 +239,8 @@ Slices: `teams` (teams, members, flags, invites, set types, team settings), `ses
 ### AD-21 — Tally logging is one idempotent request per tap [ADOPTED]
 
 - **Binds:** FR-5
-- **Prevents:** batched taps becoming an offline queue, double inserts on retry, and Undo and Fix removing different rows.
-- **Rule:** Each tap sends one `POST /api/teams/:teamId/logging/entries` carrying a **client-generated UUIDv7** id, which is the idempotency key (the only client-generated id in the system). Undo deletes by that id. Fix mode sends `DELETE .../entries/latest` with member, set type, pass and rating, which removes the newest matching row. Nothing is held client-side past a failed request.
+- **Prevents:** batched taps becoming an offline queue, double inserts on retry, and Undo and "−" removing different rows.
+- **Rule:** Each tap sends one `POST /api/teams/:teamId/logging/entries` carrying a **client-generated UUIDv7** id, which is the idempotency key (the only client-generated id in the system). Undo deletes by that id. The selected-cell bar's "−" sends `DELETE .../entries/latest` with member, set type, pass and rating, which removes the newest matching row. Nothing is held client-side past a failed request.
 
 ### AD-22 — Export contains only what the user may already see [ADOPTED]
 
@@ -256,7 +256,7 @@ Slices: `teams` (teams, members, flags, invites, set types, team settings), `ses
 | API paths | `/api/teams/:teamId/<slice>/...` (TeamScope), `/api/me/...` (UserScope), `/api/auth/*` (identity), `/api/invites/:token/preview` (public); plural nouns |
 | IDs | UUIDv7 strings, generated in core; the only exception is set entries (AD-21) |
 | Dates and times | Stored UTC ISO 8601; `session_date` `YYYY-MM-DD` in team time zone; `iso_week` `YYYY-Www` (AD-15) |
-| Enumerations | Lowercase string literals in `src/core/shared/enums.ts`: pass quality `good \| ok \| poor`; rating `0 \| 1 \| 2 \| 3`; session kind `game \| practice`; position `outside \| setter \| opposite \| middle \| libero` |
+| Enumerations | Lowercase string literals in `src/core/shared/enums.ts`: pass quality `good | ok | poor`; rating `0 | 1 | 2 | 3`; frequency `never | rarely | sometimes | mostly`;\| ok \| poor`; rating `0 \| 1 \| 2 \| 3`; session kind `game \| practice`; position `outside \| setter \| opposite \| middle \| libero` |
 | Contracts | `src/contracts/common.ts` (ids, dates, enums, `MemberSummary`, errors) plus `src/contracts/<slice>.ts`. The slice that owns an entity owns its schema; others import it and never redefine it. Worker validates every input with these Zod schemas; web uses their types |
 | Errors | `{ "error": { "code": "SNAKE_CASE", "message": "...", "details"?: ... } }`. Codes form one closed union in `src/contracts/errors.ts`, each with a fixed HTTP status; new codes are added there, never inline. Core returns typed results, not thrown strings |
 | State mutation | Only use cases mutate state; single-slice multi-row writes use a D1 batch in that slice's adapter; cross-slice writes use the unit of work (AD-18) |
@@ -419,6 +419,8 @@ setter-diary/
 - **Workers Paid plan (US$5/month):** move when AI regularly hits the daily allocation or D1 nears 500 MB (about 3 million sets); no code change.
 - **Paid or different AI provider:** switch via the `AiGateway` adapter and AI Gateway routing when quality or volume needs it.
 - **Precomputed stats tables:** only inside progress (AD-17), and only if on-read aggregation exceeds the 10 ms CPU or read limits.
+- **Team time zone setting:** v1 teams use `Australia/Sydney`; a manager-editable time zone comes in a later version (stored dates are never rewritten).
+- **Delegated logging:** a manager-appointed member logs on a setter's behalf; add a flag and a sessions/logging policy entry. Sessions already store `setter_member_id` and `created_by_member_id` separately.
 - **Per-team AI quota:** a config addition when several communities compete for the free allocation.
 - **Video calibration storage:** an R2 adapter behind a new storage port, with its future slice.
 - **CSV column layout:** defined in the account slice's stories; scope is fixed by AD-22.

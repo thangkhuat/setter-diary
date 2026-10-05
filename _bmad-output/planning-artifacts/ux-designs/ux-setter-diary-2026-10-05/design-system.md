@@ -174,16 +174,16 @@ Pills (`rounded.full`) for position chips, player tabs and the `+` button. `roun
 - **`+` button (`fab-add`)**: red circle, white plus, bottom-right. Opens a pop-up sheet to add a player or create a session.
 - **Sheet**: pop-up form sliding up from the bottom; title, large fields, red primary button at the bottom.
 - **Player tab**: pill per involved player in a horizontal strip; selected tab is filled navy with the player's set count.
-- **Tally grid**: set types as navy row labels on the left; four rating columns headed by the rating colours with the numeral only (captions live on the hitter rating sheet and in screen-reader labels); each cell a 56px neutral square showing the count in `display-number` (empty cells show a faint "+"). In Fix mode, cells get a "−" badge.
+- **Tally grid**: set types as navy row labels on the left; four rating columns headed by the rating colours with the numeral only (captions live on the hitter rating sheet and in screen-reader labels); each cell a 56px neutral square showing the count in `display-number` (empty cells show a faint "+"). The tapped cell is highlighted as selected.
 - **Pass chip**: square-cornered neutral chip with label (Good / OK / Poor); selected gets a heavy ink border.
 - **Position chip**: 48px navy outline pill with the standard abbreviation (OH / S / OPP / MB / L) under a selected player on the Who played? sheet; selected fills navy.
-- **Rating button** (hitter rating sheet): four equal coloured blocks in one row, numeral centred in `display-number`, one-word caption underneath in `meta`: 3 Full swing, 2 Adjust, 1 Free ball, 0 Unhittable [ASSUMPTION on captions].
+- **Frequency chips** (hitter rating sheet): one row per rating, starting with a rating-colour block (numeral in `display-number`, caption in `meta`: 3 Full swing, 2 Adjust, 1 Free ball, 0 Unhittable), followed by four 48px chips Never / Rarely / Sometimes / Mostly; the selected chip fills navy. Rows ordered 3 to 0.
 - **Session card**: header with date, Game or Practice, total sets; one row per involved player with name, set count, average as a bold numeral, and a stacked bar of the four rating colours.
 - **Progress grid**: hitters as rows, set types as columns; each cell filled with the rating colour nearest its average, average numeral inside, and "before → now" since the chosen date underneath in `meta`.
 - **Trend chart**: one column per week, height = average rating, coloured by the nearest rating colour; % hittable as an `ink-primary` line on top (navy-dark is too close to the rating blue in dark mode); set-type filter chips above, styled like position chips.
 - **"To rate" card**: `card` with a 6px brand-red left edge, team name and session in `meta`, setter and date in `label`.
 - **Manager tag**: small outline pill "Manager" in `meta`, beside the member's role on the roster.
-- **Fix toggle**: outline pill above the tally grid; when on, fills ink with "Fix: tap to remove".
+- **Selected-cell bar**: full-width bar above the tab bar on the Logging screen; `surface-raised`; the selected cell in `label` ("Mia · High outside · Good · 3"); the count in `display-number` between a "−" and a "+" button, each 56px; "−" greyed out at 0.
 - **Toast**: ink bar above the bottom edge, message left, "Undo" right in bold underlined text (rating colours stay reserved for ratings).
 - **Ask AI button**: 52px round button, `surface-raised` with a hairline border, showing a sparkle icon; sits bottom-right on Progress. Neutral on purpose: red stays the primary action.
 - **Chat bubble**: AI messages on `surface-raised`, left-aligned; the setter's messages navy with `on-brand` text, right-aligned. Numbers the AI cites (ratings) keep their rating colour chips.
