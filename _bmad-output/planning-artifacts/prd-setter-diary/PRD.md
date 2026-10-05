@@ -6,6 +6,7 @@ companions:
   - reporting-requirements.md
   - ../ux-designs/ux-setter-diary-2026-10-05/design-system.md
   - ../ux-designs/ux-setter-diary-2026-10-05/ux-specification.md
+  - ../architecture/architecture-setter-diary-2026-10-05/architecture.md
 sources:
   - ../../../docs/product-brief.md
 ---
@@ -61,7 +62,7 @@ Pain to solve. A volleyball setter on a mostly-beginner team has no reliable rec
   - **Acceptance criteria:** Export produces a CSV of the user's own logged sets and ratings that opens in common phone spreadsheet apps.
 - **FR-14**
   - **Requirement:** A setter can open a conversation with an AI that analyses their progress data and discusses how to improve.
-  - **Acceptance criteria:** The AI opens by pointing to specific patterns in the setter's own data (e.g. weakest hitter × set-type combination, trend direction), and answers follow-up questions with suggestions tied to that data; the conversation is saved and only that setter can view it. The AI is Claude, opened from a Claude button, and runs on a Claude account the setter connects; without one, the feature is unavailable.
+  - **Acceptance criteria:** The AI opens by pointing to specific patterns in the setter's own data (e.g. weakest hitter × set-type combination, trend direction), and answers follow-up questions with suggestions tied to that data; the conversation is saved and only that setter can view it. The AI is opened from an Ask AI button and runs on the app's free AI allowance; each person may start 2 discussions a day, and when that limit or the app's daily allowance is reached the setter is told to try again tomorrow.
 - **FR-15**
   - **Requirement:** A player joins a team through an invite link from one of its managers.
   - **Acceptance criteria:** Opening the link lets a new user create an account already on the team, or adds the team to an existing account; an expired or used link is refused.
@@ -69,8 +70,8 @@ Pain to solve. A volleyball setter on a mostly-beginner team has no reliable rec
   - **Requirement:** One account can belong to several teams, with a role per team, and switch between them.
   - **Acceptance criteria:** A user who is a setter in one team and a hitter in another sees the matching views in each, and no data crosses between the two teams.
 - **FR-17**
-  - **Requirement:** Each team has one or more team managers who administer it: roster, invites, set-type list, and team-wide view grants. Being a manager is separate from playing as setter or hitter.
-  - **Acceptance criteria:** The team creator is its first manager; a manager can make another member a manager; a non-manager trying to change the roster, invites, set types, or grants is refused.
+  - **Requirement:** Each team has one or more team managers who administer it: roster, invites, members' setter and hitter roles, set-type list, and team-wide view grants. Being a manager is separate from playing as setter or hitter.
+  - **Acceptance criteria:** The team creator is its first manager and a setter; new members start as hitters; a manager can change a member's roles or make them a manager; a non-manager trying any of these is refused; the last manager cannot step down or leave.
 
 ## Constraints & Non-Functional Requirements
 
@@ -81,8 +82,9 @@ Pain to solve. A volleyball setter on a mostly-beginner team has no reliable rec
 - Hitter rating entry is flexible in timing: feedback is given on the spot but often entered at the end of a game or practice.
 - The AI (FR-14) uses only data the user is permitted to see; it never widens access.
 - AI conversations are private to their owner; no one else can view them, including team-wide view holders.
-- No user's data is sent to an AI provider before users are told and have consented; every user gives this consent at sign-up, since a setter's analysis includes teammates' ratings.
-- AI runs on the setter's own connected Claude account: their plan sets limits and cost, and the app pays nothing for AI.
+- No user's data is sent to an AI provider before users are told and have consented; every user gives this consent at sign-up, since a setter's analysis includes teammates' ratings. Only aggregated stats are sent, with teammates' names replaced by labels; players who haven't consented are never named or shown individually.
+- AI runs free on a provider that does not train on our data (Cloudflare Workers AI), through one AI gateway; the app pays nothing for AI; limits are daily and configurable (v1: 2 new discussions per person per day, plus the app-wide allowance).
+- No passwords: sign-in is Google or a passkey.
 - A user's AI conversations are deleted with their account.
 - Deleting an account anonymises the user's data rather than removing it.
 - v1 users are in Australia; the product may extend worldwide.
@@ -97,7 +99,8 @@ Pain to solve. A volleyball setter on a mostly-beginner team has no reliable rec
 
 - AI discussion for hitters (comes later, alongside hitter quality logging).
 - Hitting stats and passing stats (later version). Pass quality stays only as context on each logged set.
-- In-app billing or paid subscription tiers.
+- In-app billing or paid subscription tiers; paid AI; users connecting their own AI accounts.
+- Email delivery (no domain in v1): invites are shared as links.
 - Pass-quality breakdown view and setter-vs-hitter comparison view (deferred; see `reporting-requirements.md`).
 - Fixed player positions on the roster.
 - Calibration sessions linked to video notes, and any video capture.
@@ -113,14 +116,13 @@ Pain to solve. A volleyball setter on a mostly-beginner team has no reliable rec
 - Team manager is a permission on top of a member's playing role; a team can have several managers, and the creator is the first.
 - A player can be both a setter and a hitter on the same team (e.g. two-setter systems).
 - A hitter sees every team setter's trend and their own row of each setter's grid.
-- Web vs native is left to architecture; phone-first and always-online are the only platform requirements.
-- Sign-in is email and password for now; Google/Apple sign-in and the auth implementation are left to architecture. Sign-up asks for 18+, privacy-policy and AI-processing confirmation.
-- How the Claude account is connected and its credentials stored securely is left to architecture.
+- The app is an installable web app (PWA) on Cloudflare's free plan, launched on a `*.workers.dev` address; see `architecture.md`.
+- Sign-in is Google or a passkey; lost access is recovered by a team manager resending the invite. Email login and Sign in with Apple are later options. Sign-up asks for 18+, privacy-policy and AI-processing confirmation.
+- If a custom domain is bought later, passkey users re-register once through a manager's re-invite; Google users are unaffected.
 - A hitter's session rating locks at their next session with that setter.
-
 - The setter–hitter rating gap is captured in v1 but displayed only when the comparison view ships.
 - Monthly filmed calibration is a user practice in v1; the app does not support it.
-- "Week" in trend views means calendar week.
+- "Week" in trend views means an ISO week (Monday to Sunday) in the team's time zone.
 - All players are 18 or older; no minor-specific handling.
 - Setters still own their sessions and logging; managers do not log sets unless they are also setters.
 - A player who leaves a team loses access to that team's data.
@@ -128,5 +130,3 @@ Pain to solve. A volleyball setter on a mostly-beginner team has no reliable rec
 ## Open Questions
 
 - Which privacy obligations apply in v1 (e.g. Australian Privacy Act 1988), and which must the design anticipate for worldwide expansion (e.g. GDPR)?
-- Can a setter connect their own Claude account? As far as known, Claude Pro/Max plans can't be used by third-party apps; that would need an Anthropic API key billed per use, or the app paying. Confirm in architecture.
-- Using the Claude name and mark in the app must follow Anthropic's brand and trademark guidelines; check before launch.

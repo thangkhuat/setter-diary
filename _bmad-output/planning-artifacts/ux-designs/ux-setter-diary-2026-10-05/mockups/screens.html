@@ -144,7 +144,7 @@ figcaption b{color:var(--ink)}
 .grp{font-size:18px;font-weight:800;margin:36px auto 14px;max-width:1500px;border-bottom:2px solid var(--border);padding-bottom:6px}
 .eg{font-size:13px;color:var(--ink2);font-weight:500;margin-left:auto}
 .cnt{font-weight:800;font-size:16px;font-variant-numeric:tabular-nums}
-.claude{position:absolute;right:16px;bottom:76px;width:52px;height:52px;border-radius:9999px;background:var(--raised);border:1px solid var(--border);display:grid;place-items:center;font-size:26px;color:var(--ink);box-shadow:0 4px 12px rgba(0,0,0,.25)}
+.askai{position:absolute;right:16px;bottom:76px;width:52px;height:52px;border-radius:9999px;background:var(--raised);border:1px solid var(--border);display:grid;place-items:center;font-size:26px;color:var(--ink);box-shadow:0 4px 12px rgba(0,0,0,.25)}
 .msg{max-width:84%;padding:10px 12px;border-radius:12px;font-size:14px;line-height:1.4;margin-bottom:8px}
 .msg.ai{background:var(--raised)}
 .msg.me{background:var(--navy);color:var(--on-brand);margin-left:auto}
@@ -311,29 +311,29 @@ figcaption b{color:var(--ink)}
       <span class="nm">Leo</span><span class="gc e"><b>–</b></span><span class="gc e"><b>–</b></span><span class="gc c2"><b>2.2</b><i>1.6→2.2</i></span><span class="gc e"><b>–</b></span><span class="gc e"><b>–</b></span>
     </div>
   </div>
-  <div class="claude" aria-label="Discuss with Claude">✳</div>
+  <div class="askai" aria-label="Ask AI">✨</div>
   <div class="tabs"><div>Sessions</div><div class="on">Progress</div><div>Team</div></div>
 </div>
-<figcaption><b>6 · Progress.</b> Top: weekly consistency trend, filtered here to High outside. Columns show the average rating; the line shows % hittable. Below: the hitter × set-type grid. Each cell shows the current average and its change since the chosen date. The small round <b>Claude</b> button (bottom-right) opens the AI discussion.</figcaption>
+<figcaption><b>6 · Progress.</b> Top: weekly consistency trend, filtered here to High outside. Columns show the average rating; the line shows % hittable. Below: the hitter × set-type grid. Each cell shows the current average and its change since the chosen date. The small round <b>Ask AI</b> button (bottom-right) opens the AI discussion.</figcaption>
 </figure>
-<!-- 7. Claude discussion -->
+<!-- 7. AI discussion -->
 <figure>
 <div class="phone">
   <div class="status"><span>9:15</span><span>●●● 94%</span></div>
   <div class="top"><span class="back">‹ Progress</span><span class="back" style="font-size:15px">Past discussions</span></div>
   <div class="content" style="padding:0 12px">
-    <h2 style="font-size:22px;margin-bottom:12px">✳ Claude</h2>
-    <div class="who">CLAUDE</div>
+    <h2 style="font-size:22px;margin-bottom:12px">✨ AI discussion</h2><p class="meta" style="margin:-6px 0 10px">1 of 2 discussions today</p>
+    <div class="who">AI</div>
     <div class="msg ai">High outside is trending up: average 2.0 → 2.5 over three weeks, and 82% hittable last week.</div>
     <div class="msg ai">Your lowest spot is back sets to Josh at <span class="chip-r c1">1.3</span>. Five of the seven came off OK or poor passes. Want to dig into that?</div>
     <div class="who" style="text-align:right">YOU</div>
     <div class="msg me">Yes. What should I focus on at Tuesday's practice?</div>
-    <div class="who">CLAUDE</div>
+    <div class="who">AI</div>
     <div class="msg ai">Your back sets to Mia rose from <span class="chip-r c1">1.4</span> to <span class="chip-r c2">2.2</span>, mostly off good passes. Try the same with Josh: back sets off good passes first, then add OK passes once those average 2 or more. I'll compare next week.</div>
   </div>
-  <div class="inputbar"><div class="field"><span class="ph">Message Claude</span></div><div class="send">↑</div></div>
+  <div class="inputbar"><div class="field"><span class="ph">Message the AI</span></div><div class="send">↑</div></div>
 </div>
-<figcaption><b>7 · Claude discussion.</b> Opened from the Claude button on Progress (setters only). Claude starts from the setter's own data and answers follow-ups. Discussions are saved under <b>Past discussions</b>, visible only to the setter. With no Claude account connected, this screen shows a connect prompt instead. The ✳ glyph is a placeholder for the Claude mark.</figcaption>
+<figcaption><b>7 · AI discussion.</b> Opened from the Ask AI button on Progress (setters only). Runs free on Cloudflare Workers AI; each person can start 2 discussions a day, and when the limit is reached the screen says to come back tomorrow. The AI starts from the setter's own data and answers follow-ups. Discussions are saved under <b>Past discussions</b>, visible only to the setter. Teammates' names are replaced with labels before anything is sent.</figcaption>
 </figure>
 
 </div>
@@ -444,16 +444,15 @@ figcaption b{color:var(--ink)}
   <div class="content">
     <div class="logo" style="margin-top:50px">Logo</div>
     <h2 class="center" style="font-size:26px;font-weight:800;margin-bottom:24px">Setter Diary</h2>
-    <div class="flabel">EMAIL</div>
-    <div class="field"><span>thang@example.com</span></div>
-    <div class="flabel">PASSWORD</div>
-    <div class="field"><span>••••••••••</span><span class="act">Show</span></div>
-    <div class="textbtn" style="justify-items:end;color:var(--navy)">Forgot password?</div>
-    <div class="primary">Log in</div>
+    <div style="margin-top:40px">
+      <div class="primary">Continue with Google</div>
+      <div class="secondary">Use a passkey</div>
+    </div>
+    <p class="center meta" style="font-size:14px;margin-top:18px;line-height:1.4">No passwords. Lost access? Ask your team manager to resend your invite.</p>
     <div class="textbtn">New here? <span style="color:var(--navy);margin-left:4px">Create an account</span></div>
   </div>
 </div>
-<figcaption><b>11 · Log in.</b> Email and password, with show/hide password and a reset link. Users stay logged in on their phone, so after courtside sessions the app opens straight to their home tab.</figcaption>
+<figcaption><b>11 · Log in.</b> Continue with Google, or use a passkey (Face ID or fingerprint). No passwords; lost access is fixed by a manager's re-invite. Users stay logged in on their phone, so after a session the app opens straight to their home tab.</figcaption>
 </figure>
 
 <!-- 12. Create account (from invite) -->
@@ -466,16 +465,13 @@ figcaption b{color:var(--ink)}
     <div class="torate" style="margin-bottom:6px"><div class="meta">Invite</div><div class="q" style="margin:2px 0 0;font-size:16px">You're joining My team</div></div>
     <div class="flabel">NAME</div>
     <div class="field"><span>Sam</span></div>
-    <div class="flabel">EMAIL</div>
-    <div class="field"><span class="ph">you@example.com</span></div>
-    <div class="flabel">PASSWORD</div>
-    <div class="field"><span class="ph">At least 8 characters</span><span class="act">Show</span></div>
-    <div class="row" style="border:none;align-items:flex-start;min-height:0;margin-top:12px;font-size:13px;line-height:1.4"><span class="box on" style="width:24px;height:24px;font-size:14px;flex:none">✓</span><span class="meta">I'm 18 or older and agree to the privacy policy.</span></div>
-    <div class="row" style="border:none;align-items:flex-start;min-height:0;margin-top:8px;font-size:13px;line-height:1.4"><span class="box on" style="width:24px;height:24px;font-size:14px;flex:none">✓</span><span class="meta">My team stats may be analysed by Claude (Anthropic) when a setter asks for AI feedback.</span></div>
-    <div class="primary">Create account</div>
+    <div class="row" style="border:none;align-items:flex-start;min-height:0;margin-top:14px;font-size:13px;line-height:1.4"><span class="box on" style="width:24px;height:24px;font-size:14px;flex:none">✓</span><span class="meta">I'm 18 or older and agree to the privacy policy.</span></div>
+    <div class="row" style="border:none;align-items:flex-start;min-height:0;margin-top:8px;font-size:13px;line-height:1.4"><span class="box on" style="width:24px;height:24px;font-size:14px;flex:none">✓</span><span class="meta">My team stats may be analysed by AI (Cloudflare) when a setter asks for feedback. Names are never shared.</span></div>
+    <div class="primary" style="margin-top:18px">Continue with Google</div>
+    <div class="secondary">Create a passkey</div>
   </div>
 </div>
-<figcaption><b>12 · Create account.</b> Opened from an invite link, so the team is shown and the name is pre-filled from the roster. Without an invite, the card is hidden and Welcome (screen 13) follows. Two required checkboxes: 18+ and privacy policy, and consent to AI analysis by Claude.</figcaption>
+<figcaption><b>12 · Create account.</b> Opened from an invite link, so the team is shown and the name is pre-filled from the roster. Without an invite, the card is hidden and Welcome (screen 13) follows. Two required checkboxes (18+ and privacy policy; AI analysis), then Google or a passkey. iPhone users then see an Add-to-Home-Screen tip.</figcaption>
 </figure>
 
 <!-- 13. Welcome / no team -->
@@ -514,7 +510,7 @@ figcaption b{color:var(--ink)}
   <div class="fab">+</div>
   <div class="tabs"><div>Sessions</div><div>Progress</div><div class="on">Team</div></div>
 </div>
-<figcaption><b>14 · Team (team manager).</b> <b>Team stats</b> (only for members who have Team view), the editable set types, then the roster with each member's role. Team managers (tagged <b>Manager</b>) turn on <b>Team view</b> to give a member access to all team stats, and tap a member to make them a manager. Members who aren't managers see this screen read-only, without <b>+</b> or switches. Red <b>+</b> adds a player.</figcaption>
+<figcaption><b>14 · Team (team manager).</b> <b>Team stats</b> (only for members who have Team view), the editable set types, then the roster with each member's role. Team managers (tagged <b>Manager</b>) turn on <b>Team view</b> to give a member access to all team stats, and tap a member to set them as setter or hitter, or make them a manager. Members who aren't managers see this screen read-only, without <b>+</b> or switches. Red <b>+</b> adds a player.</figcaption>
 </figure>
 
 <!-- 15. Add player + invite -->
@@ -589,8 +585,6 @@ figcaption b{color:var(--ink)}
   <div class="content">
     <h2 style="font-size:22px;margin-bottom:12px">Settings</h2>
     <div class="row"><span class="avatar">T</span><span class="grow">Thang<span class="sub">2 teams</span></span></div>
-    <div class="sec">AI</div>
-    <div class="row"><span class="grow">Claude account<span class="sub">Connected · used for Claude discussions</span></span><span class="meta">›</span></div>
     <div class="sec">YOUR DATA</div>
     <div class="row"><span class="grow">Export my data<span class="sub">CSV file you can open in a spreadsheet app</span></span><span class="meta">›</span></div>
     <div class="sec">TEAMS</div>
@@ -598,10 +592,10 @@ figcaption b{color:var(--ink)}
     <div class="sec">ACCOUNT</div>
     <div class="row"><span class="grow">Log out</span></div>
     <div class="row"><span class="grow danger">Delete account</span></div>
-    <p class="meta" style="margin-top:10px;line-height:1.4">Deleting your account keeps your stats with your teams, anonymised, and deletes your Claude discussions. A confirmation sheet explains this first.</p>
+    <p class="meta" style="margin-top:10px;line-height:1.4">Deleting your account keeps your stats with your teams, anonymised, and deletes your AI discussions. A confirmation sheet explains this first.</p>
   </div>
 </div>
-<figcaption><b>18 · Settings.</b> Opened from the profile button. Claude account connection (setters), CSV export, joining another team, and account deletion (stats stay with the team, anonymised; Claude discussions are deleted).</figcaption>
+<figcaption><b>18 · Settings.</b> Opened from the profile button. CSV export, joining another team, and account deletion (stats stay with the team, anonymised; AI discussions are deleted).</figcaption>
 </figure>
 </div>
 </body>

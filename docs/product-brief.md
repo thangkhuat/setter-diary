@@ -72,12 +72,12 @@ Accuracy comes from design choices, not from video.
 
 ## AI discussion
 
-A setter taps a small Claude button to open a conversation with Claude, an AI that analyses their progress data and discusses how to improve. The AI opens by pointing to specific patterns in the setter's data, such as their weakest hitter and set type combination or the direction of a trend. It then answers follow-up questions with suggestions tied to that data.
+A setter taps a small Ask AI button to open a conversation with an AI that analyses their progress data and discusses how to improve. The AI opens by pointing to specific patterns in the setter's data, such as their weakest hitter and set type combination or the direction of a trend. It then answers follow-up questions with suggestions tied to that data.
 
 - The AI only uses data the user is allowed to see.
 - Conversations are saved, and only their owner can view them.
 - Every user is told, and gives consent at sign-up, before any data is sent to an AI provider.
-- Setters connect their own Claude account. Their plan sets the limits and cost; the app pays nothing for AI and has no billing. (To confirm in architecture: Claude Pro/Max plans may not be usable by other apps, which would need an Anthropic API key billed per use.)
+- The AI runs free on Cloudflare Workers AI, which does not train on our data. Each person can start 2 discussions a day; when that or the app's daily allowance runs out, the app says to try again tomorrow. No AI accounts, no billing.
 - AI conversations are deleted along with the account.
 - AI discussion for hitters comes later, alongside logging of hitters' own quality.
 
@@ -87,7 +87,7 @@ A setter taps a small Claude button to open a conversation with Claude, an AI th
 
 - Phone-first; internet is always available at training, so no offline mode
 - Team sign-up, with multiple teams and data kept separate per team; one account can belong to several teams
-- Accounts and login (email and password) for setters and teammates; teammates join by invite link
+- Sign-in with Google or a passkey (no passwords) for setters and teammates; teammates join by invite link; lost access is fixed by a manager's re-invite
 - More than one setter per team, each with their own diary
 - Team managers who run the roster, invites, set-type list and team-wide view
 - Tally logging of sets (hitter, set type, pass quality, rating) after a game set, drill or game, with optional per-session positions
@@ -96,7 +96,7 @@ A setter taps a small Claude button to open a conversation with Claude, an AI th
 - Teammates can view their setters' progress
 - Team-wide stats view, granted to team members
 - Account deletion (stats anonymised and kept) and CSV export of your own data
-- AI discussion with Claude for setters on how to improve, based on their own data
+- Free AI discussion for setters on how to improve, based on their own data
 
 **Later**
 
@@ -122,10 +122,10 @@ A setter taps a small Claude button to open a conversation with Claude, an AI th
 - [x] AI: setters only, or every player? Setters in v1; hitters later, with hitter quality logging.
 - [x] AI: are conversations kept, and who can see them? Kept; only their owner can view them.
 - [x] AI: does sending data to an AI provider need consent? Yes.
-- [x] AI cost model: paid app subscription tiers, or each user connects their own AI account? Each setter connects their own Claude account.
+- [x] AI cost model: paid app subscription tiers, or each user connects their own AI account? Neither: the AI runs free on Cloudflare Workers AI with daily limits (RFC-001).
 - [x] Who runs the team (roster, invites, set types, access)? Team managers, so the app can grow beyond setter logging.
-- [ ] Can setters connect their own Claude account, or does the app need an Anthropic API key? To confirm in architecture.
-- [ ] Use of the Claude name and mark must follow Anthropic's brand guidelines; check before launch.
+- [x] Can setters connect their own Claude account? No: Anthropic doesn't allow it in other apps, so the AI moved to free Cloudflare Workers AI (RFC-001).
+- [x] Domain? Launch free on a workers.dev address; passkey users re-register once if a domain is bought later.
 
 ## Next steps in BMad
 
