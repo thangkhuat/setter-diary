@@ -1,0 +1,8 @@
+# Project naming: the spec kernel is published as an industry-standard PRD.
+# See _bmad/custom/naming-conventions.md
+[workflow]
+persistent_facts = ["file:{project-root}/_bmad/custom/naming-conventions.md"]
+spec_filename = "PRD.md"
+spec_template = "{project-root}/_bmad/custom/templates/prd-template.md"
+spec_output_path = "{output_folder}/planning-artifacts"
+run_folder_pattern = "prd-{slug}"

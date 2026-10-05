@@ -3,15 +3,15 @@ name: Setter Diary
 status: final
 updated: 2026-10-05
 sources:
-  - ../../../specs/spec-setter-diary/SPEC.md
-design: DESIGN.md
+  - ../../prd-setter-diary/PRD.md
+design: design-system.md
 ---
 
-# Setter Diary — Experience Spine
+# Setter Diary — UX Specification
 
 ## Foundation
 
-Phone-first, single surface. Web vs native is an architecture decision; this spine is platform-neutral. No UI system named. `DESIGN.md` is the visual identity reference. Light or dark follows the device setting. Always online (spec); no offline states.
+Phone-first, single surface. Web vs native is an architecture decision; this document is platform-neutral. No UI system named. `design-system.md` is the visual identity reference. Light or dark follows the device setting. Always online (spec); no offline states.
 
 Usage context: indoor gym, sweaty hands, morning or noon sessions. A game runs about 45 minutes (2–3 sets, no breaks); practice drills have no breaks, but game-play within practice has short breaks. The app is mostly opened **at the end of the session**, so the core job is fast recall-and-log in a few minutes, not live scoring.
 
@@ -20,25 +20,25 @@ Usage context: indoor gym, sweaty hands, morning or noon sessions. A game runs a
 | Surface | Reached from | Who | Purpose |
 |---|---|---|---|
 | Log in | App open when logged out | All | Email and password [ASSUMPTION: sign-in method open to architecture]; forgot-password link; link to create an account. Users stay logged in. |
-| Create account | "Create an account" link, or an invite link | All | Name, email, password; 18+ and privacy-policy checkbox [ASSUMPTION]; separate AI-processing consent checkbox (required, CAP-14). From an invite, shows the team and pre-fills the name. |
+| Create account | "Create an account" link, or an invite link | All | Name, email, password; 18+ and privacy-policy checkbox [ASSUMPTION]; separate AI-processing consent checkbox (required, FR-14). From an invite, shows the team and pre-fills the name. |
 | Welcome (no team) | After sign-up without an invite | All | Create a team, or join with an invite link |
 | Sessions | Tab (setter home) | Setter | Session cards, newest first; each card shows every involved player's logs for that session; `+` creates a session |
 | New session sheet | `+` on Sessions | Setter | Date (default today), Game or Practice, notes (optional) |
 | Who played? sheet | After New session | Setter | Multi-select roster players in this session, with an optional position for each (this session only) |
-| Logging | New session, or tapping a session card | Setter | Log sets per player (CAP-5) |
-| Progress | Tab | Setter | Consistency trend (CAP-7) and hitter × set-type grid (CAP-8); Claude button bottom-right |
-| Claude discussion | Claude button on Progress | Setter | AI discussion about the setter's own data (CAP-14); past discussions; connect prompt if no Claude account |
+| Logging | New session, or tapping a session card | Setter | Log sets per player (FR-5) |
+| Progress | Tab | Setter | Consistency trend (FR-7) and hitter × set-type grid (FR-8); Claude button bottom-right |
+| Claude discussion | Claude button on Progress | Setter | AI discussion about the setter's own data (FR-14); past discussions; connect prompt if no Claude account |
 | Team | Tab | All | Roster with each member's role and a Manager tag. Team managers add players with `+`, edit set types, grant team-wide view, and make others managers; everyone else sees it read-only |
 | Member sheet | Tap a roster row (managers only) | Team manager | Team manager toggle; remove from team. (Team view is also switchable inline on the roster.) |
 | Add player sheet | `+` on Team | Team manager | Name only (positions vary between sessions); produces invite link |
-| Set types | Team tab section | Team manager | Edit the team's set-type list (CAP-3); `+` adds a type |
-| Home | Tab (hitter home) | Hitter | "To rate" cards + own received-set progress (CAP-9) |
-| Rate session sheet | "To rate" card or notification | Hitter | One overall 0–3 rating for the session's sets from that setter (CAP-6) |
+| Set types | Team tab section | Team manager | Edit the team's set-type list (FR-3); `+` adds a type |
+| Home | Tab (hitter home) | Hitter | "To rate" cards + own received-set progress (FR-9) |
+| Rate session sheet | "To rate" card or notification | Hitter | One overall 0–3 rating for the session's sets from that setter (FR-6) |
 | Setters | Tab | Hitter | Each team setter's trend + the hitter's own grid row |
-| Team stats | Team tab, if granted | Team-wide view holders | All setters' diaries and all hitters' data (CAP-11) |
+| Team stats | Team tab, if granted | Team-wide view holders | All setters' diaries and all hitters' data (FR-11) |
 | Settings | Profile button in header | All | Claude account connect/disconnect (setters); export CSV; delete account; join another team via invite |
 
-→ Visual reference: `mockups/screens.html` (all 18 v1 screens). The spines win on any conflict with the mock.
+→ Visual reference: `mockups/screens.html` (all 18 v1 screens). These documents win on any conflict with the mock.
 
 **Navigation.** [ASSUMPTION] Bottom tabs:
 
@@ -50,7 +50,7 @@ Usage context: indoor gym, sweaty hands, morning or noon sessions. A game runs a
 
 ## Voice and Tone
 
-Microcopy. Brand posture lives in `DESIGN.md`.
+Microcopy. Brand posture lives in `design-system.md`.
 
 | Do | Don't |
 |---|---|
@@ -62,7 +62,7 @@ Microcopy. Brand posture lives in `DESIGN.md`.
 
 ## Component Patterns
 
-Behavioral. Visual specs live in `DESIGN.md.Components`.
+Behavioral. Visual specs live in `design-system.md` (Components).
 
 | Component | Use | Behavioral rules |
 |---|---|---|
@@ -78,7 +78,7 @@ Behavioral. Visual specs live in `DESIGN.md.Components`.
 | Session card | Sessions | Header: date, Game or Practice, total sets. One row per involved player: name, set count, average, rating-mix bar. Tap a player row → that player's entries; tap the header → Logging to add or edit. |
 | Manager tag | Team roster | Small tag "Manager" next to the member's role. |
 | "To rate" card | Hitter Home | One per unrated session from each setter; tap opens Rate session sheet. |
-| Progress grid | Progress, Setters, Team stats | Hitter × set-type averages for one setter. Hitter sees only their own row (spec). Date picker sets the "since" comparison; each cell shows before → now. |
+| Progress grid | Progress, Setters, Team stats | Hitter × set-type averages for one setter. Hitter sees only their own row (PRD). Date picker sets the "since" comparison; each cell shows before → now. |
 | Trend chart | Progress, Setters, Team stats | Weekly average rating and % hittable for one setter; set-type filter chips above it (default: all types). |
 | Claude button | Progress (setters only) | Small round button, bottom-right. Tap opens Claude discussion. Not shown to hitters. |
 | Claude discussion | Full screen from Claude button | Claude opens with 2–3 observations drawn from the setter's data (for example, lowest hitter × set-type cell, trend direction), then the setter types replies. "Past discussions" lists saved conversations, private to the setter. |
@@ -118,7 +118,7 @@ Behavioral. Visual specs live in `DESIGN.md.Components`.
 
 ## Accessibility Floor
 
-Behavioral. Visual contrast lives in `DESIGN.md`.
+Behavioral. Visual contrast lives in `design-system.md`.
 
 - Ratings always show the numeral; colour is never the only cue. Pass and position chips carry text labels.
 - Tap targets ≥ 56px on Logging, ≥ 48px elsewhere.
@@ -128,7 +128,7 @@ Behavioral. Visual contrast lives in `DESIGN.md`.
 
 ## Hitter Rating
 
-Resolves the spec's open question on hitter rating period and flow.
+Resolves the PRD's open question on hitter rating period and flow.
 
 - **Period:** one overall 0–3 rating **per session, per setter**.
 - **When:** available as soon as the setter creates the session with that hitter included, so the hitter can rate right after the game, which is when reflection happens. Feedback during play stays verbal.
@@ -187,9 +187,9 @@ Edge: Sam already plays for another team → the link adds this team to Sam's ex
 3. The team starts with the default set types (high outside, back set, quick, shoot, pipe) and an empty roster.
 4. **Climax:** on the Team tab, Thang adds the first teammates with `+` and shares their invite links, ready for Saturday's game.
 
-## Spec Feedback
+## PRD Feedback
 
-All items raised here were absorbed into the spec on 2026-10-05 (CAP-4, CAP-6, CAP-14, CAP-15, CAP-16). Open for the spec or architecture:
+All items raised here were absorbed into the PRD on 2026-10-05 (FR-4, FR-6, FR-14, FR-15, FR-16). Open for the spec or architecture:
 
-- Claude account connection: consumer Claude plans may not be usable by third-party apps (see SPEC Open Questions).
+- Claude account connection: consumer Claude plans may not be usable by third-party apps (see PRD Open Questions).
 - Use of the Claude name and mark must follow Anthropic's brand guidelines.
