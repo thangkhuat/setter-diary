@@ -4,7 +4,7 @@ description: Phone-first volleyball setter training log. Team colours, high-cont
 status: final
 updated: 2026-10-05
 sources:
-  - ../../../specs/spec-setter-diary/SPEC.md
+  - ../../prd-setter-diary/PRD.md
 colors:
   surface-base: '#FFFFFF'
   surface-raised: '#F2F4F8'
@@ -169,7 +169,7 @@ Pills (`rounded.full`) for position chips, player tabs and the `+` button. `roun
 
 ## Components
 
-→ Visual reference: `mockups/screens.html`. DESIGN.md wins on any conflict with the mock.
+→ Visual reference: `mockups/screens.html`. design-system.md wins on any conflict with the mock.
 
 - **`+` button (`fab-add`)**: red circle, white plus, bottom-right. Opens a pop-up sheet to add a player or create a session.
 - **Sheet**: pop-up form sliding up from the bottom; title, large fields, red primary button at the bottom.

@@ -1,0 +1,4 @@
+# Project naming conventions (PRD, design system, UX specification, ADR, RFC).
+# See _bmad/custom/naming-conventions.md
+[workflow]
+persistent_facts = ["file:{project-root}/_bmad/custom/naming-conventions.md"]
