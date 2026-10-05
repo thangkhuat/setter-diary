@@ -83,8 +83,8 @@ figcaption b{color:var(--ink)}
 .toast{position:absolute;left:16px;right:16px;bottom:80px;background:var(--ink);color:var(--bg);border-radius:12px;height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-weight:600}
 .toast b{text-decoration:underline}
 /* tally + positions */
-.posrow{display:flex;gap:6px;padding:0 0 10px 40px;border-bottom:1px solid var(--border)}
-.pchip{height:48px;padding:0 12px;border-radius:9999px;border:2px solid var(--navy);color:var(--navy);display:flex;align-items:center;font-weight:700;font-size:14px}
+.posrow{display:flex;gap:6px;padding:0 0 10px 36px;border-bottom:1px solid var(--border)}
+.pchip{height:48px;min-width:44px;justify-content:center;padding:0 10px;border-radius:9999px;border:2px solid var(--navy);color:var(--navy);display:flex;align-items:center;font-weight:700;font-size:14px}
 .pchip.on{background:var(--navy);color:var(--on-brand)}
 .check.sel{border-bottom:none}
 .tally{display:grid;grid-template-columns:56px repeat(4,56px);gap:4px;margin-top:6px}
@@ -144,6 +144,15 @@ figcaption b{color:var(--ink)}
 .grp{font-size:18px;font-weight:800;margin:36px auto 14px;max-width:1500px;border-bottom:2px solid var(--border);padding-bottom:6px}
 .eg{font-size:13px;color:var(--ink2);font-weight:500;margin-left:auto}
 .cnt{font-weight:800;font-size:16px;font-variant-numeric:tabular-nums}
+.claude{position:absolute;right:16px;bottom:76px;width:52px;height:52px;border-radius:9999px;background:var(--raised);border:1px solid var(--border);display:grid;place-items:center;font-size:26px;color:var(--ink);box-shadow:0 4px 12px rgba(0,0,0,.25)}
+.msg{max-width:84%;padding:10px 12px;border-radius:12px;font-size:14px;line-height:1.4;margin-bottom:8px}
+.msg.ai{background:var(--raised)}
+.msg.me{background:var(--navy);color:var(--on-brand);margin-left:auto}
+.who{font-size:11px;font-weight:800;color:var(--ink2);margin:2px 0 4px;letter-spacing:.04em}
+.inputbar{position:absolute;left:12px;right:12px;bottom:14px;display:flex;gap:8px}
+.inputbar .field{flex:1}
+.send{width:52px;height:52px;border-radius:12px;background:var(--navy);color:var(--on-brand);display:grid;place-items:center;font-weight:800;font-size:20px}
+.chip-r{display:inline-block;min-width:22px;text-align:center;border-radius:6px;font-weight:800;color:var(--on-rating);padding:0 4px}
 </style>
 </head>
 <body>
@@ -207,16 +216,16 @@ figcaption b{color:var(--ink)}
     <h3>Who played?</h3>
     <p class="meta" style="margin-bottom:4px">Sat 3 Oct · Game · position optional</p>
     <div class="check sel"><span class="box on">✓</span>Mia</div>
-    <div class="posrow"><span class="pchip">Outside</span><span class="pchip on">Opposite</span><span class="pchip">Middle</span></div>
+    <div class="posrow"><span class="pchip">OH</span><span class="pchip">S</span><span class="pchip on">OPP</span><span class="pchip">MB</span><span class="pchip">L</span></div>
     <div class="check sel"><span class="box on">✓</span>Josh</div>
-    <div class="posrow"><span class="pchip on">Outside</span><span class="pchip">Opposite</span><span class="pchip">Middle</span></div>
+    <div class="posrow"><span class="pchip on">OH</span><span class="pchip">S</span><span class="pchip">OPP</span><span class="pchip">MB</span><span class="pchip">L</span></div>
     <div class="check sel"><span class="box on">✓</span>Leo</div>
-    <div class="posrow"><span class="pchip">Outside</span><span class="pchip">Opposite</span><span class="pchip on">Middle</span></div>
+    <div class="posrow"><span class="pchip">OH</span><span class="pchip">S</span><span class="pchip">OPP</span><span class="pchip on">MB</span><span class="pchip">L</span></div>
     <div class="check"><span class="box"></span>Sam</div>
     <div class="primary">Start logging</div>
   </div>
 </div>
-<figcaption><b>3 · Who played?</b> Pick the players in this session and, optionally, their position for today. Positions are pre-filled from last time; Mia moves from outside to opposite today.</figcaption>
+<figcaption><b>3 · Who played?</b> Pick the players in this session and, optionally, their position for today: OH outside, S setter, OPP opposite, MB middle, L libero. Positions are pre-filled from last time; Mia moves from outside to opposite today.</figcaption>
 </figure>
 <!-- 3. Logging (tally) -->
 <figure>
@@ -302,14 +311,35 @@ figcaption b{color:var(--ink)}
       <span class="nm">Leo</span><span class="gc e"><b>–</b></span><span class="gc e"><b>–</b></span><span class="gc c2"><b>2.2</b><i>1.6→2.2</i></span><span class="gc e"><b>–</b></span><span class="gc e"><b>–</b></span>
     </div>
   </div>
+  <div class="claude" aria-label="Discuss with Claude">✳</div>
   <div class="tabs"><div>Sessions</div><div class="on">Progress</div><div>Team</div></div>
 </div>
-<figcaption><b>6 · Progress.</b> Top: weekly consistency trend, filtered here to High outside. Columns show the average rating; the line shows % hittable. Below: the hitter × set-type grid. Each cell shows the current average and its change since the chosen date.</figcaption>
+<figcaption><b>6 · Progress.</b> Top: weekly consistency trend, filtered here to High outside. Columns show the average rating; the line shows % hittable. Below: the hitter × set-type grid. Each cell shows the current average and its change since the chosen date. The small round <b>Claude</b> button (bottom-right) opens the AI discussion.</figcaption>
 </figure>
+<!-- 7. Claude discussion -->
+<figure>
+<div class="phone">
+  <div class="status"><span>9:15</span><span>●●● 94%</span></div>
+  <div class="top"><span class="back">‹ Progress</span><span class="back" style="font-size:15px">Past discussions</span></div>
+  <div class="content" style="padding:0 12px">
+    <h2 style="font-size:22px;margin-bottom:12px">✳ Claude</h2>
+    <div class="who">CLAUDE</div>
+    <div class="msg ai">High outside is trending up: average 2.0 → 2.5 over three weeks, and 82% hittable last week.</div>
+    <div class="msg ai">Your lowest spot is back sets to Josh at <span class="chip-r c1">1.3</span>. Five of the seven came off OK or poor passes. Want to dig into that?</div>
+    <div class="who" style="text-align:right">YOU</div>
+    <div class="msg me">Yes. What should I focus on at Tuesday's practice?</div>
+    <div class="who">CLAUDE</div>
+    <div class="msg ai">Your back sets to Mia rose from <span class="chip-r c1">1.4</span> to <span class="chip-r c2">2.2</span>, mostly off good passes. Try the same with Josh: back sets off good passes first, then add OK passes once those average 2 or more. I'll compare next week.</div>
+  </div>
+  <div class="inputbar"><div class="field"><span class="ph">Message Claude</span></div><div class="send">↑</div></div>
+</div>
+<figcaption><b>7 · Claude discussion.</b> Opened from the Claude button on Progress (setters only). Claude starts from the setter's own data and answers follow-ups. Discussions are saved under <b>Past discussions</b>, visible only to the setter. With no Claude account connected, this screen shows a connect prompt instead. The ✳ glyph is a placeholder for the Claude mark.</figcaption>
+</figure>
+
 </div>
 <h2 class="grp">Hitter</h2>
 <div class="screens">
-<!-- 7. Hitter Home -->
+<!-- 8. Hitter Home -->
 <figure>
 <div class="phone">
   <div class="status"><span>12:54</span><span>●●● 65%</span></div>
@@ -340,7 +370,7 @@ figcaption b{color:var(--ink)}
   </div>
   <div class="tabs"><div class="on">Home</div><div>Setters</div><div>Team</div></div>
 </div>
-<figcaption><b>7 · Hitter Home (Mia).</b> "To rate" cards from all of Mia's teams, each labelled with its team. Tapping the Uni social card switches to that team. Below: the quality of sets Mia received, week by week.</figcaption>
+<figcaption><b>8 · Hitter Home (Mia).</b> "To rate" cards from all of Mia's teams, each labelled with its team. Tapping the Uni social card switches to that team. Below: the quality of sets Mia received, week by week.</figcaption>
 </figure>
 <!-- 4. Hitter rating -->
 <figure>
@@ -364,9 +394,9 @@ figcaption b{color:var(--ink)}
     <div class="primary">Save rating</div>
   </div>
 </div>
-<figcaption><b>8 · Hitter rating (Mia).</b> A "To rate" card appears as soon as Thang creates the session with Mia in it. One overall rating per session, per setter.</figcaption>
+<figcaption><b>9 · Hitter rating (Mia).</b> A "To rate" card appears as soon as Thang creates the session with Mia in it. One overall rating per session, per setter.</figcaption>
 </figure>
-<!-- 9. Hitter Setters tab -->
+<!-- 10. Hitter Setters tab -->
 <figure>
 <div class="phone">
   <div class="status"><span>19:30</span><span>●●● 41%</span></div>
@@ -402,12 +432,12 @@ figcaption b{color:var(--ink)}
   </div>
   <div class="tabs"><div>Home</div><div class="on">Setters</div><div>Team</div></div>
 </div>
-<figcaption><b>9 · Setters (Mia).</b> Pick one of the team's setters to see their consistency trend, plus only Mia's own row of that setter's grid.</figcaption>
+<figcaption><b>10 · Setters (Mia).</b> Pick one of the team's setters to see their consistency trend, plus only Mia's own row of that setter's grid.</figcaption>
 </figure>
 </div>
 <h2 class="grp">Team and account</h2>
 <div class="screens">
-<!-- 10. Log in -->
+<!-- 11. Log in -->
 <figure>
 <div class="phone">
   <div class="status"><span>8:04</span><span>●●● 99%</span></div>
@@ -423,10 +453,10 @@ figcaption b{color:var(--ink)}
     <div class="textbtn">New here? <span style="color:var(--navy);margin-left:4px">Create an account</span></div>
   </div>
 </div>
-<figcaption><b>10 · Log in.</b> Email and password, with show/hide password and a reset link. Users stay logged in on their phone, so after courtside sessions the app opens straight to their home tab.</figcaption>
+<figcaption><b>11 · Log in.</b> Email and password, with show/hide password and a reset link. Users stay logged in on their phone, so after courtside sessions the app opens straight to their home tab.</figcaption>
 </figure>
 
-<!-- 11. Create account (from invite) -->
+<!-- 12. Create account (from invite) -->
 <figure>
 <div class="phone">
   <div class="status"><span>18:30</span><span>●●● 77%</span></div>
@@ -440,14 +470,15 @@ figcaption b{color:var(--ink)}
     <div class="field"><span class="ph">you@example.com</span></div>
     <div class="flabel">PASSWORD</div>
     <div class="field"><span class="ph">At least 8 characters</span><span class="act">Show</span></div>
-    <div class="row" style="border:none;align-items:flex-start;min-height:0;margin-top:12px;font-size:13px;line-height:1.4"><span class="box on" style="width:24px;height:24px;font-size:14px;flex:none">✓</span><span class="meta">I'm 18 or older and agree to the privacy policy. My stats are visible to my team as described there.</span></div>
+    <div class="row" style="border:none;align-items:flex-start;min-height:0;margin-top:12px;font-size:13px;line-height:1.4"><span class="box on" style="width:24px;height:24px;font-size:14px;flex:none">✓</span><span class="meta">I'm 18 or older and agree to the privacy policy.</span></div>
+    <div class="row" style="border:none;align-items:flex-start;min-height:0;margin-top:8px;font-size:13px;line-height:1.4"><span class="box on" style="width:24px;height:24px;font-size:14px;flex:none">✓</span><span class="meta">My team stats may be analysed by Claude (Anthropic) when a setter asks for AI feedback.</span></div>
     <div class="primary">Create account</div>
   </div>
 </div>
-<figcaption><b>11 · Create account.</b> Opened from an invite link, so the team is shown and the name is pre-filled from the roster. Without an invite, the card is hidden and Welcome (screen 12) follows. The checkbox covers the 18+ and privacy terms.</figcaption>
+<figcaption><b>12 · Create account.</b> Opened from an invite link, so the team is shown and the name is pre-filled from the roster. Without an invite, the card is hidden and Welcome (screen 13) follows. Two required checkboxes: 18+ and privacy policy, and consent to AI analysis by Claude.</figcaption>
 </figure>
 
-<!-- 12. Welcome / no team -->
+<!-- 13. Welcome / no team -->
 <figure>
 <div class="phone">
   <div class="status"><span>8:05</span><span>●●● 99%</span></div>
@@ -461,10 +492,10 @@ figcaption b{color:var(--ink)}
     </div>
   </div>
 </div>
-<figcaption><b>12 · Welcome, no team.</b> Shown after sign-up when the account isn't on a team. Opening an invite link skips this screen (see screen 11). The logo is a placeholder; it's designed separately.</figcaption>
+<figcaption><b>13 · Welcome, no team.</b> Shown after sign-up when the account isn't on a team. Opening an invite link skips this screen (see screen 12). The logo is a placeholder; it's designed separately.</figcaption>
 </figure>
 
-<!-- 13. Team (setter) -->
+<!-- 14. Team (setter) -->
 <figure>
 <div class="phone">
   <div class="status"><span>17:40</span><span>●●● 70%</span></div>
@@ -474,7 +505,7 @@ figcaption b{color:var(--ink)}
     <div class="sec">SET TYPES<a>+ Add</a></div>
     <div class="fchips" style="flex-wrap:wrap"><span class="fc">High outside</span><span class="fc">Back set</span><span class="fc">Quick</span><span class="fc">Shoot</span><span class="fc">Pipe</span></div>
     <div class="sec">PLAYERS · 7<span class="swl">Team view</span></div>
-    <div class="row"><span class="ini">T</span><span class="grow">Thang<span class="sub">Setter · you</span></span><span class="sw on"></span></div>
+    <div class="row"><span class="ini">T</span><span class="grow">Thang <span class="tag">Manager</span><span class="sub">Setter · you</span></span><span class="sw on"></span></div>
     <div class="row"><span class="ini">K</span><span class="grow">Kai<span class="sub">Setter</span></span><span class="sw"></span></div>
     <div class="row"><span class="ini">M</span><span class="grow">Mia<span class="sub">Hitter</span></span><span class="sw"></span></div>
     <div class="row"><span class="ini">J</span><span class="grow">Josh<span class="sub">Hitter</span></span><span class="sw"></span></div>
@@ -483,10 +514,10 @@ figcaption b{color:var(--ink)}
   <div class="fab">+</div>
   <div class="tabs"><div>Sessions</div><div>Progress</div><div class="on">Team</div></div>
 </div>
-<figcaption><b>13 · Team (setter).</b> <b>Team stats</b> (only for members who have Team view), the editable set types, then the roster with each member's role. Setters turn on <b>Team view</b> to give a member access to all team stats. Red <b>+</b> adds a player.</figcaption>
+<figcaption><b>14 · Team (team manager).</b> <b>Team stats</b> (only for members who have Team view), the editable set types, then the roster with each member's role. Team managers (tagged <b>Manager</b>) turn on <b>Team view</b> to give a member access to all team stats, and tap a member to make them a manager. Members who aren't managers see this screen read-only, without <b>+</b> or switches. Red <b>+</b> adds a player.</figcaption>
 </figure>
 
-<!-- 14. Add player + invite -->
+<!-- 15. Add player + invite -->
 <figure>
 <div class="phone">
   <div class="status"><span>17:41</span><span>●●● 70%</span></div>
@@ -505,10 +536,10 @@ figcaption b{color:var(--ink)}
     <div class="textbtn">Done</div>
   </div>
 </div>
-<figcaption><b>14 · Add player.</b> Name only, since positions are chosen per session. After <b>Add player</b>, the sheet shows the invite link to share. If Sam already has an account, the link adds this team to it.</figcaption>
+<figcaption><b>15 · Add player.</b> Team managers only. Name only, since positions are chosen per session. After <b>Add player</b>, the sheet shows the invite link to share. If Sam already has an account, the link adds this team to it.</figcaption>
 </figure>
 
-<!-- 15. Team stats -->
+<!-- 16. Team stats -->
 <figure>
 <div class="phone">
   <div class="status"><span>21:02</span><span>●●● 33%</span></div>
@@ -528,10 +559,10 @@ figcaption b{color:var(--ink)}
     <p class="meta" style="margin-top:12px">The consistency trend for the chosen setter sits above this grid; scroll up to see it.</p>
   </div>
 </div>
-<figcaption><b>15 · Team stats.</b> Only for members a setter has given Team view. Pick any setter on the team to see their full diary: trend and every hitter's row. Nobody outside the team can open it.</figcaption>
+<figcaption><b>16 · Team stats.</b> Only for members a team manager has given Team view. Pick any setter on the team to see their full diary: trend and every hitter's row. Nobody outside the team can open it.</figcaption>
 </figure>
 
-<!-- 16. Team switcher -->
+<!-- 17. Team switcher -->
 <figure>
 <div class="phone">
   <div class="status"><span>18:20</span><span>●●● 60%</span></div>
@@ -547,10 +578,10 @@ figcaption b{color:var(--ink)}
     <div class="row" style="border-bottom:none"><span class="ini">+</span><span class="grow" style="color:var(--navy)">Create a team</span></div>
   </div>
 </div>
-<figcaption><b>16 · Team switcher.</b> Tap the team name in the header. Each team shows your role there; switching to Uni social changes the tabs to the hitter set.</figcaption>
+<figcaption><b>17 · Team switcher.</b> Tap the team name in the header. Each team shows your role there; switching to Uni social changes the tabs to the hitter set.</figcaption>
 </figure>
 
-<!-- 17. Settings -->
+<!-- 18. Settings -->
 <figure>
 <div class="phone">
   <div class="status"><span>18:22</span><span>●●● 60%</span></div>
@@ -558,6 +589,8 @@ figcaption b{color:var(--ink)}
   <div class="content">
     <h2 style="font-size:22px;margin-bottom:12px">Settings</h2>
     <div class="row"><span class="avatar">T</span><span class="grow">Thang<span class="sub">2 teams</span></span></div>
+    <div class="sec">AI</div>
+    <div class="row"><span class="grow">Claude account<span class="sub">Connected · used for Claude discussions</span></span><span class="meta">›</span></div>
     <div class="sec">YOUR DATA</div>
     <div class="row"><span class="grow">Export my data<span class="sub">CSV file you can open in a spreadsheet app</span></span><span class="meta">›</span></div>
     <div class="sec">TEAMS</div>
@@ -565,10 +598,10 @@ figcaption b{color:var(--ink)}
     <div class="sec">ACCOUNT</div>
     <div class="row"><span class="grow">Log out</span></div>
     <div class="row"><span class="grow danger">Delete account</span></div>
-    <p class="meta" style="margin-top:10px;line-height:1.4">Deleting your account keeps your stats with your teams, anonymised. A confirmation sheet explains this before anything is deleted.</p>
+    <p class="meta" style="margin-top:10px;line-height:1.4">Deleting your account keeps your stats with your teams, anonymised, and deletes your Claude discussions. A confirmation sheet explains this first.</p>
   </div>
 </div>
-<figcaption><b>17 · Settings.</b> Opened from the profile button. CSV export, joining another team, and account deletion (stats stay with the team, anonymised).</figcaption>
+<figcaption><b>18 · Settings.</b> Opened from the profile button. Claude account connection (setters), CSV export, joining another team, and account deletion (stats stay with the team, anonymised; Claude discussions are deleted).</figcaption>
 </figure>
 </div>
 </body>

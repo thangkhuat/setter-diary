@@ -10,13 +10,14 @@ The core problem: without video, a setter has no reliable record of whether thei
 
 ## Users and sharing
 
-Teams sign up on their own, and each team's data is kept separate. Every player on a team has an account and their own progress view. A team can have more than one setter (for example when running two setters); each setter who uses the app logs their own sets and has their own diary. A player can be both a setter and a hitter.
+Teams sign up on their own, and each team's data is kept separate. Every player has one account and their own progress view, and can belong to several teams with a different role in each (for example, setter in one team, hitter in another). Teammates join through an invite link. A team can have more than one setter (for example when running two setters); each setter who uses the app logs their own sets and has their own diary. A player can be both a setter and a hitter.
 
 | User | Can log | Can view |
 | --- | --- | --- |
-| Setter | Their own sets, with full detail; roster and set-type list | Their own diary only: progress across their hitters and set types, including each hitter's rating. Never another setter's diary |
+| Setter | Their own sets and sessions, with full detail | Their own diary only: progress across their hitters and set types, including each hitter's rating. Never another setter's diary |
 | Hitter (teammate) | Overall rating of the sets they received from a setter | Own progress, plus each team setter's progress (for now, the quality of sets they received; hitting stats are out of scope). Never other hitters' data |
-| Member with team-wide view | As their role | All of their team's stats. Granted by the team's setters; only team members can have it |
+| Team manager | Roster and invite links, set-type list, team-wide view grants, appointing other managers | As their role. Being a manager sits on top of playing as setter or hitter; the team creator is the first manager |
+| Member with team-wide view | As their role | All of their team's stats. Granted by a team manager; only team members can have it |
 
 Accounts, login and per-user permissions are in scope from the start. This is deliberate: the app holds teammates' data, so access control is part of the design, not an add-on.
 
@@ -32,11 +33,11 @@ Accounts, login and per-user permissions are in scope from the start. This is de
 
 ## What gets logged
 
-Each logged set has four core fields, grouped under a session (date, drill or match, notes). Every set opportunity is logged.
+Each logged set has four core fields, grouped under a session (date, game or practice, notes, and the players involved). Every set opportunity is logged. Positions aren't fixed while the team is new: each player involved can be given a position for that session (outside, setter, opposite, middle, libero).
 
 | Field | Values | Why it matters |
 | --- | --- | --- |
-| Hitter | A teammate on the roster | Tracks how sets adapt to each hitter |
+| Hitter | A player involved in the session | Tracks how sets adapt to each hitter |
 | Set type | High outside, back set, quick, shoot, pipe (editable list) | Tracks growth in variations |
 | Pass quality | Good, OK, poor | A good set off a poor pass is a bigger win |
 | Rating | 0 to 3 (scale below) | The core quality measure |
@@ -48,7 +49,7 @@ The rating is based on what the hitter could do with the ball, not how the set f
 - **1**: only a free ball or tip was possible
 - **0**: unhittable, or a setting fault
 
-Hitters give one overall rating of the sets they received, on the same 0–3 scale, based on how comfortable the balls were to hit. A hittable ball (2 or 3) is a good ball. Timing must stay flexible: feedback is given on the spot, but often entered at the end of a game or practice.
+Hitters give one overall rating per session for the sets they received from that setter, on the same 0–3 scale, based on how comfortable the balls were to hit. A hittable ball (2 or 3) is a good ball. Timing must stay flexible: feedback is given on the spot, but often entered at the end of a game or practice.
 
 ## Keeping the data accurate
 
@@ -56,7 +57,7 @@ Accuracy comes from design choices, not from video.
 
 - **Outcome-based rating:** the 0–3 scale asks what the hitter could do, which is harder to fudge than "was it good?"
 - **Hitter second opinion:** hitters rate the sets they received overall. The gap between a hitter's rating and the setter's average for that hitter is shown as its own signal.
-- **Log soon after:** the setter logs with large one-tap buttons after a game set, a drill or the whole game. Logging sooner means less to recall from memory.
+- **Log soon after, by tally:** after a game set, a drill or the whole game, the setter recalls how many sets of each kind went to each player and taps a grid once per set. Logging sooner means less to recall from memory.
 - **Log every opportunity:** no fixed sample block. Set chances vary too much, for example when the team runs two setters.
 - **Monthly calibration:** film one session a month and compare against the logged ratings.
 - **Trends over sessions:** views emphasise multi-week trends, since single sessions are noisy.
@@ -71,12 +72,12 @@ Accuracy comes from design choices, not from video.
 
 ## AI discussion
 
-A setter can open a conversation with an AI that analyses their progress data and discusses how to improve. The AI opens by pointing to specific patterns in the setter's data, such as their weakest hitter and set type combination or the direction of a trend. It then answers follow-up questions with suggestions tied to that data.
+A setter taps a small Claude button to open a conversation with Claude, an AI that analyses their progress data and discusses how to improve. The AI opens by pointing to specific patterns in the setter's data, such as their weakest hitter and set type combination or the direction of a trend. It then answers follow-up questions with suggestions tied to that data.
 
 - The AI only uses data the user is allowed to see.
 - Conversations are saved, and only their owner can view them.
 - Every user is told, and gives consent at sign-up, before any data is sent to an AI provider.
-- Setters connect their own AI account. Their provider's plan sets the limits and cost; the app pays nothing for AI and has no billing.
+- Setters connect their own Claude account. Their plan sets the limits and cost; the app pays nothing for AI and has no billing. (To confirm in architecture: Claude Pro/Max plans may not be usable by other apps, which would need an Anthropic API key billed per use.)
 - AI conversations are deleted along with the account.
 - AI discussion for hitters comes later, alongside logging of hitters' own quality.
 
@@ -85,17 +86,17 @@ A setter can open a conversation with an AI that analyses their progress data an
 **Version 1**
 
 - Phone-first; internet is always available at training, so no offline mode
-- Team sign-up, with multiple teams and data kept separate per team
-- Accounts and login for setters and teammates
+- Team sign-up, with multiple teams and data kept separate per team; one account can belong to several teams
+- Accounts and login (email and password) for setters and teammates; teammates join by invite link
 - More than one setter per team, each with their own diary
-- Team roster and editable set-type list
-- One-tap logging of sets (hitter, set type, pass quality, rating) after a game set, drill or game
-- Hitters give an overall rating of the sets they received
+- Team managers who run the roster, invites, set-type list and team-wide view
+- Tally logging of sets (hitter, set type, pass quality, rating) after a game set, drill or game, with optional per-session positions
+- Hitters give one overall rating per session for the sets they received
 - Consistency trend and hitter × set type grid
 - Teammates can view their setters' progress
 - Team-wide stats view, granted to team members
 - Account deletion (stats anonymised and kept) and CSV export of your own data
-- AI discussion for setters on how to improve, based on their own data
+- AI discussion with Claude for setters on how to improve, based on their own data
 
 **Later**
 
@@ -116,12 +117,15 @@ A setter can open a conversation with an AI that analyses their progress data an
 - [x] When a player leaves a team, does the team keep their history? Yes.
 - [x] Can a user export their own data? Yes, as CSV.
 - [x] Where are users based? Australia for now, possibly worldwide later.
-- [ ] What period does a hitter's overall rating cover, and how do they reach it? To be settled in UX; timing must stay flexible.
+- [x] What period does a hitter's overall rating cover? One rating per session, per setter, available as soon as the session exists.
 - [ ] Which privacy rules apply in v1 (e.g. Australian Privacy Act 1988), and which must the design anticipate for worldwide use (e.g. GDPR)?
 - [x] AI: setters only, or every player? Setters in v1; hitters later, with hitter quality logging.
 - [x] AI: are conversations kept, and who can see them? Kept; only their owner can view them.
 - [x] AI: does sending data to an AI provider need consent? Yes.
-- [x] AI cost model: paid app subscription tiers, or each user connects their own AI account? Each setter connects their own.
+- [x] AI cost model: paid app subscription tiers, or each user connects their own AI account? Each setter connects their own Claude account.
+- [x] Who runs the team (roster, invites, set types, access)? Team managers, so the app can grow beyond setter logging.
+- [ ] Can setters connect their own Claude account, or does the app need an Anthropic API key? To confirm in architecture.
+- [ ] Use of the Claude name and mark must follow Anthropic's brand guidelines; check before launch.
 
 ## Next steps in BMad
 
