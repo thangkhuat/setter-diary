@@ -37,8 +37,8 @@ Pain to solve. A volleyball setter on a mostly-beginner team has no reliable rec
   - **Requirement:** A setter logs their own set opportunities in a batch — after a game set, a drill, or a whole game — by recalling, per player, how many sets of each set type, pass quality and rating they gave (see `data-dictionary.md`).
   - **Acceptance criteria:** Each counted set is stored as an individual set; logging works at any of those points with no typing; one game set's sets are logged within 3 minutes on a phone.
 - **FR-6**
-  - **Requirement:** A hitter gives one overall 0–3 rating per session for the sets they received from a setter, judged by how comfortable the balls were to hit.
-  - **Acceptance criteria:** The rating can be given as soon as the setter's session including that hitter exists; it is stored with its hitter, setter, and session, separate from the setter's per-set ratings; that setter sees each hitter's rating.
+  - **Requirement:** A hitter gives one rating mix per session for the sets they received from a setter: for each rating 0–3, how often it happened (Never, Rarely, Sometimes, Mostly), judged by how comfortable the balls were to hit.
+  - **Acceptance criteria:** The rating mix can be given as soon as the setter's session including that hitter exists; at least one rating is above Never; it is stored with its hitter, setter and session, separate from the setter's per-set ratings; that setter sees each hitter's mix.
 - **FR-7**
   - **Requirement:** A per-setter consistency trend shows weekly average rating and percentage of hittable sets (2 or 3), filterable by set type.
   - **Acceptance criteria:** Filtering to high outside answers "is this setter more consistent week over week?" from logged data (definition in `reporting-requirements.md`).
@@ -105,6 +105,7 @@ Pain to solve. A volleyball setter on a mostly-beginner team has no reliable rec
 - Fixed player positions on the roster.
 - Calibration sessions linked to video notes, and any video capture.
 - Coach role.
+- Logging on a setter's behalf by a manager-appointed member (later update; v1 is setter-only).
 - Offline logging: internet is always available at training.
 
 ## Success Metrics

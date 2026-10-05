@@ -33,10 +33,11 @@ Usage context: indoor gym, sweaty hands, morning or noon sessions. A game runs a
 | Add player sheet | `+` on Team | Team manager | Name only (positions vary between sessions); produces invite link |
 | Set types | Team tab section | Team manager | Edit the team's set-type list (FR-3); `+` adds a type |
 | Home | Tab (hitter home) | Hitter | "To rate" cards + own received-set progress (FR-9) |
-| Rate session sheet | "To rate" card or notification | Hitter | One overall 0–3 rating for the session's sets from that setter (FR-6) |
+| Rate session sheet | "To rate" card or notification | Hitter | One rating mix for the session's sets from that setter: for each rating 0–3, Never / Rarely / Sometimes / Mostly (FR-6) |
 | Setters | Tab | Hitter | Each team setter's trend + the hitter's own grid row |
 | Team stats | Team tab, if granted | Team-wide view holders | All setters' diaries and all hitters' data (FR-11) |
 | Settings | Profile button in header | All | Export CSV; delete account; join another team via invite |
+| Leave team | Team switcher | All | Confirm sheet: "Leave <team>? Your stats stay with the team, and you lose access." Refused for the last manager. |
 
 → Visual reference: `mockups/screens.html` (all 18 v1 screens). These documents win on any conflict with the mock.
 
@@ -71,11 +72,11 @@ Behavioral. Visual specs live in `design-system.md` (Components).
 | Player tabs | Logging | One tab per involved player, showing set count. Tap switches player; entries stay with their player. |
 | Pass chips | Logging | Good / OK / Poor, single select, sticky per player. Applies to every tally tap until changed. |
 | Tally grid | Logging | Rows = the team's set types; columns = ratings 0–3. Each cell shows how many sets this player got for that set type and rating, under the selected pass. **Tapping a cell adds one set** (player, set type, pass, rating). Haptic tick + toast "Mia · High outside · 3 · +1" with Undo (5 s). Built for recalling counts after a game rather than replaying each set. |
-| Fix toggle | Logging | When on, tapping a cell removes one set instead of adding; turns off automatically after 10 s or on tab switch [ASSUMPTION]. |
+| Selected-cell bar | Logging, saved session in Fix | Tapping a grid cell adds one set and selects that cell. A bar at the bottom shows the selected cell ("Mia · High outside · Good · 3"), its count and 56px "−" and "+" buttons; "−" removes the newest matching set and is disabled at 0. The bar follows whichever cell was tapped last; no modes. |
 | Position chips | Who played? sheet | For each selected player: OH / S / OPP / MB / L (Outside, Setter, Opposite, Middle, Libero), optional, pre-filled from that player's previous session. Saved with this session only. |
-| Rating button | Rate session sheet | Four coloured blocks; tap selects, Save rating confirms. |
-| Entry list | Session card player row | All of that player's sets in the session, grouped by set type; tap to edit or delete one. |
-| Session card | Sessions | Header: date, Game or Practice, total sets. One row per involved player: name, set count, average, rating-mix bar. Tap a player row → that player's entries; tap the header → Logging to add or edit. |
+| Frequency chips | Rate session sheet | One row per rating 0–3 (numeral, colour and caption), each with Never / Rarely / Sometimes / Mostly, single select per row, default Never. Save rating is enabled once at least one row is above Never. |
+| Saved session view | Session card header or player row | Saved sessions open read-only (protects against accidental taps). **Fix** unlocks the same behaviour as initial logging: tap adds and selects, the selected-cell bar adjusts. Done or leaving locks again. Wrong pass, set type or rating is corrected with − on one cell and a tap or + on another. |
+| Session card | Sessions | Header: date, Game or Practice, total sets. One row per involved player: name, set count, average, rating-mix bar. Tap a player row or the header → the saved session, read-only until Fix. |
 | Manager tag | Team roster | Small tag "Manager" next to the member's role. |
 | "To rate" card | Hitter Home | One per unrated session from each setter; tap opens Rate session sheet. |
 | Progress grid | Progress, Setters, Team stats | Hitter × set-type averages for one setter. Hitter sees only their own row (PRD). Date picker sets the "since" comparison; each cell shows before → now. |
@@ -95,8 +96,8 @@ Behavioral. Visual specs live in `design-system.md` (Components).
 | No sessions | Sessions | "After your next game or practice, tap + to log it." |
 | No players selected | Who played? sheet | Continue disabled until at least one player is selected. |
 | Undo window | Logging | Toast with Undo for 5 s after each tally tap. |
-| Fix mode on | Logging | Grid cells show a "−" badge and the header reads "Fix: tap to remove". |
-| Zero count | Logging, Fix mode | Tapping a cell at 0 does nothing; no negative counts. |
+| Saved session locked | Saved session view | Counts read-only; only Fix unlocks editing. |
+| Zero count | Selected-cell bar | "−" is disabled at 0; no negative counts. |
 | Thin data | Progress, Setters, Home | Show what exists; trend line needs 2+ weeks [ASSUMPTION]: "Not enough data yet — log 2 more weeks to see a trend." |
 | Rating closed | Rate session sheet | Locks per the close rule in Hitter Rating; the card disappears. |
 | To rate across teams | Home | "To rate" cards from all your teams, each labelled with its team name [ASSUMPTION]; tapping one switches to that team. |
@@ -130,11 +131,11 @@ Behavioral. Visual contrast lives in `design-system.md`.
 
 Resolves the PRD's open question on hitter rating period and flow.
 
-- **Period:** one overall 0–3 rating **per session, per setter**.
+- **Period:** one rating mix **per session, per setter**: for each rating 0–3, how often it happened (Never, Rarely, Sometimes, Mostly).
 - **When:** available as soon as the setter creates the session with that hitter included, so the hitter can rate right after the game, which is when reflection happens. Feedback during play stays verbal.
 - **How the hitter gets there:** a "To rate" card on Home, plus a notification if the platform supports it [ASSUMPTION].
 - **Closes:** at the hitter's next session with that setter [ASSUMPTION].
-- **Prompt wording:** "How comfortable were Thang's sets to hit today?" with the four rating buttons.
+- **Prompt wording:** "How were Thang's sets to hit today?" with one frequency row per rating, from 3 Full swing down to 0 Unhittable.
 
 ## Key Flows
 
@@ -149,13 +150,13 @@ Resolves the PRD's open question on hitter rating period and flow.
 7. Thang taps **Done**; Sessions opens with today's card on top.
 8. **Climax:** the session card lists every player Thang logged: Mia 14 sets, average 2.4, a mostly green bar; Josh 9 sets, 1.8; Leo 6 sets, 2.2. Thang sees how each hitter's sets went today and can tap any row to check the entries.
 
-Failure: a mis-tap → Undo on the toast, or turn on **Fix** and tap the cell to remove one.
+Failure: a mis-tap → Undo on the toast, or "−" in the selected-cell bar.
 
 ### Flow 2 — Rate the setter after the game (Mia, outside hitter, same noon)
 
 1. Mia gets a notification, "Rate today's sets from Thang.", or opens the app and sees the "To rate" card on Home.
 2. Mia taps it; the Rate session sheet opens.
-3. Mia taps **2**.
+3. Mia sets **2 · Adjust** to Mostly, **3 · Full swing** to Sometimes and **1 · Free ball** to Rarely, then taps **Save rating**.
 4. **Climax:** "Thanks — rating saved." Home now shows the quality of the sets Mia received this month, trending up.
 
 Edge: Thang hasn't created the session yet → no card yet; it appears once the session exists.
