@@ -99,6 +99,19 @@ components:
     border: '{colors.brand-navy}'
     selected-background: '{colors.brand-navy}'
     selected-foreground: '{colors.on-brand}'
+  claude-button:
+    size: 52px
+    rounded: '{rounded.full}'
+    background: '{colors.surface-raised}'
+    border: '{colors.border}'
+  chat-bubble-claude:
+    background: '{colors.surface-raised}'
+    rounded: '{rounded.md}'
+    typography: '{typography.body}'
+  chat-bubble-user:
+    background: '{colors.brand-navy}'
+    foreground: '{colors.on-brand}'
+    rounded: '{rounded.md}'
   pass-chip:
     height: '{spacing.tap-log}'
     rounded: '{rounded.sm}'
@@ -163,14 +176,17 @@ Pills (`rounded.full`) for position chips, player tabs and the `+` button. `roun
 - **Player tab**: pill per involved player in a horizontal strip; selected tab is filled navy with the player's set count.
 - **Tally grid**: set types as navy row labels on the left; four rating columns headed by the rating colours with the numeral only (captions live on the hitter rating sheet and in screen-reader labels); each cell a 56px neutral square showing the count in `display-number` (empty cells show a faint "+"). In Fix mode, cells get a "−" badge.
 - **Pass chip**: square-cornered neutral chip with label (Good / OK / Poor); selected gets a heavy ink border.
-- **Position chip**: 48px navy outline pill (Outside / Opposite / Middle) under a selected player on the Who played? sheet; selected fills navy.
+- **Position chip**: 48px navy outline pill with the standard abbreviation (OH / S / OPP / MB / L) under a selected player on the Who played? sheet; selected fills navy.
 - **Rating button** (hitter rating sheet): four equal coloured blocks in one row, numeral centred in `display-number`, one-word caption underneath in `meta`: 3 Full swing, 2 Adjust, 1 Free ball, 0 Unhittable [ASSUMPTION on captions].
 - **Session card**: header with date, Game or Practice, total sets; one row per involved player with name, set count, average as a bold numeral, and a stacked bar of the four rating colours.
 - **Progress grid**: hitters as rows, set types as columns; each cell filled with the rating colour nearest its average, average numeral inside, and "before → now" since the chosen date underneath in `meta`.
 - **Trend chart**: one column per week, height = average rating, coloured by the nearest rating colour; % hittable as an `ink-primary` line on top (navy-dark is too close to the rating blue in dark mode); set-type filter chips above, styled like position chips.
 - **"To rate" card**: `card` with a 6px brand-red left edge, team name and session in `meta`, setter and date in `label`.
+- **Manager tag**: small outline pill "Manager" in `meta`, beside the member's role on the roster.
 - **Fix toggle**: outline pill above the tally grid; when on, fills ink with "Fix: tap to remove".
 - **Toast**: ink bar above the bottom edge, message left, "Undo" right in bold underlined text (rating colours stay reserved for ratings).
+- **Claude button**: 52px round button, `surface-raised` with a hairline border, showing the Claude mark; sits bottom-right on Progress. Neutral on purpose: red stays the primary action. Use of the Claude name and mark follows Anthropic's brand guidelines; the mock uses a placeholder glyph.
+- **Chat bubble**: Claude messages on `surface-raised`, left-aligned; the setter's messages navy with `on-brand` text, right-aligned. Numbers Claude cites (ratings) keep their rating colour chips.
 
 ## Do's and Don'ts
 
