@@ -1,0 +1,575 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Setter Diary Screens</title>
+<style>
+/* Governed by: DESIGN.md (Colors, Typography, Shapes, Components),
+   EXPERIENCE.md (Information Architecture, Component Patterns, Hitter Rating, Key Flows 1-2).
+   Spines win on conflict. Light/dark follows the device setting. */
+:root{
+  --bg:#FFFFFF; --raised:#F2F4F8; --ink:#0B0F1A; --ink2:#5A6272; --border:#D9DDE5;
+  --navy:#14213D; --red:#D62839; --on-brand:#FFFFFF;
+  --r0:#9AA1AC; --r1:#F5B700; --r2:#4DA3FF; --r3:#2BB673; --on-rating:#0B0F1A;
+  --page:#E6E9EF;
+  --font:system-ui,-apple-system,Roboto,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#000000; --raised:#151A24; --ink:#F5F7FA; --ink2:#9AA3B2; --border:#2A3140;
+    --navy:#8FA8D9; --red:#FF4D5E; --on-brand:#000000; --page:#0A0C10;
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--page);color:var(--ink);padding:24px 16px}
+h1{font-size:22px;font-weight:800;margin-bottom:4px}
+.intro{color:var(--ink2);font-size:14px;margin-bottom:20px;max-width:760px;line-height:1.45}
+.screens{display:flex;flex-wrap:wrap;gap:28px;justify-content:center}
+figure{width:340px;max-width:100%}
+figcaption{font-size:13px;color:var(--ink2);margin-top:10px;line-height:1.4}
+figcaption b{color:var(--ink)}
+.phone{position:relative;height:700px;border-radius:40px;border:10px solid #111;background:var(--bg);overflow:hidden;display:flex;flex-direction:column}
+.status{height:28px;font-size:12px;font-weight:600;display:flex;justify-content:space-between;align-items:center;padding:0 20px}
+.top{display:flex;align-items:center;justify-content:space-between;padding:8px 16px 12px}
+.top h2{font-size:22px;font-weight:700}
+.team{font-size:13px;color:var(--ink2);font-weight:500}
+.avatar{width:36px;height:36px;border-radius:9999px;background:var(--navy);color:var(--on-brand);display:grid;place-items:center;font-weight:700;font-size:14px}
+.content{flex:1;overflow:hidden;padding:0 16px}
+.tabs{display:flex;border-top:1px solid var(--border);height:64px}
+.tabs div{flex:1;display:grid;place-items:center;font-size:12px;font-weight:700;color:var(--ink2)}
+.tabs .on{color:var(--navy)}
+.fab{position:absolute;right:20px;bottom:84px;width:64px;height:64px;border-radius:9999px;background:var(--red);color:var(--on-brand);font-size:36px;font-weight:300;display:grid;place-items:center;box-shadow:0 6px 16px rgba(0,0,0,.3)}
+/* session card */
+.card{background:var(--raised);border-radius:12px;padding:12px;margin-bottom:12px}
+.card-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.card-h b{font-size:17px}
+.meta{font-size:13px;color:var(--ink2);font-weight:500}
+.prow{display:grid;grid-template-columns:64px 52px 40px 1fr;align-items:center;gap:8px;min-height:48px;border-top:1px solid var(--border)}
+.prow .n{font-weight:700;font-size:16px}
+.avg{font-size:20px;font-weight:800;font-variant-numeric:tabular-nums}
+.bar{display:flex;height:12px;border-radius:9999px;overflow:hidden}
+.bar i{display:block;height:100%}
+.c0{background:var(--r0)}.c1{background:var(--r1)}.c2{background:var(--r2)}.c3{background:var(--r3)}
+/* sheet */
+.dim{position:absolute;inset:0;background:rgba(0,0,0,.45)}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--bg);border-radius:20px 20px 0 0;padding:12px 16px 20px}
+.grab{width:40px;height:5px;border-radius:9999px;background:var(--border);margin:0 auto 12px}
+.sheet h3{font-size:20px;font-weight:700;margin-bottom:4px}
+.check{display:flex;align-items:center;gap:12px;min-height:52px;border-bottom:1px solid var(--border);font-size:17px;font-weight:600}
+.box{width:28px;height:28px;border-radius:8px;border:2px solid var(--ink2);display:grid;place-items:center;font-size:18px}
+.box.on{background:var(--navy);border-color:var(--navy);color:var(--on-brand)}
+.pos{margin-left:auto;font-size:13px;color:var(--ink2);font-weight:500}
+.primary{margin-top:16px;height:52px;border-radius:12px;background:var(--red);color:var(--on-brand);display:grid;place-items:center;font-weight:700;font-size:17px}
+/* logging */
+.done{font-weight:700;color:var(--red);font-size:17px}
+.ptabs{display:flex;gap:8px;margin-bottom:14px}
+.ptab{height:56px;padding:0 16px;border-radius:9999px;border:2px solid var(--border);display:flex;align-items:center;gap:8px;font-weight:700;font-size:16px}
+.ptab.on{background:var(--navy);border-color:var(--navy);color:var(--on-brand)}
+.ptab small{font-size:13px;opacity:.8}
+.lbl{font-size:12px;font-weight:800;letter-spacing:.06em;color:var(--ink2);margin:10px 0 6px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{height:48px;padding:0 14px;border-radius:9999px;border:2px solid var(--navy);color:var(--navy);display:flex;align-items:center;font-weight:700;font-size:15px}
+.chip.on{background:var(--navy);color:var(--on-brand)}
+.pass{flex:1;height:56px;border-radius:8px;background:var(--raised);border:3px solid transparent;display:grid;place-items:center;font-weight:700;font-size:16px}
+.pass.on{border-color:var(--ink)}
+.ratings{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.rb{height:76px;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--on-rating)}
+.rb b{font-size:32px;font-weight:800;line-height:1}
+.rb span{font-size:11px;font-weight:700;margin-top:4px}
+.entries{margin-top:12px;font-size:14px}
+.entry{display:flex;justify-content:space-between;align-items:center;min-height:36px;border-bottom:1px solid var(--border)}
+.dot{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-weight:800;color:var(--on-rating);font-size:14px}
+.toast{position:absolute;left:16px;right:16px;bottom:80px;background:var(--ink);color:var(--bg);border-radius:12px;height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-weight:600}
+.toast b{text-decoration:underline}
+/* tally + positions */
+.posrow{display:flex;gap:6px;padding:0 0 10px 40px;border-bottom:1px solid var(--border)}
+.pchip{height:48px;padding:0 12px;border-radius:9999px;border:2px solid var(--navy);color:var(--navy);display:flex;align-items:center;font-weight:700;font-size:14px}
+.pchip.on{background:var(--navy);color:var(--on-brand)}
+.check.sel{border-bottom:none}
+.tally{display:grid;grid-template-columns:56px repeat(4,56px);gap:4px;margin-top:6px}
+.th{height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;gap:4px;color:var(--on-rating);font-weight:800;font-size:15px}
+.rl{display:flex;align-items:center;font-size:13px;font-weight:700;color:var(--navy);line-height:1.15}
+.cell{height:56px;border-radius:12px;background:var(--raised);display:grid;place-items:center;font-size:24px;font-weight:800;font-variant-numeric:tabular-nums}
+.cell.z{color:var(--ink2);font-size:20px;font-weight:400;opacity:.5}
+.lblrow{display:flex;justify-content:space-between;align-items:center}
+.fix{height:36px;padding:0 14px;border-radius:9999px;border:2px solid var(--ink2);font-size:13px;font-weight:700;color:var(--ink2);display:flex;align-items:center}
+/* hitter */
+.torate{background:var(--raised);border-radius:12px;padding:14px;border-left:6px solid var(--red)}
+.q{font-size:17px;font-weight:700;margin:6px 0 14px;line-height:1.3}
+.rb.sel{outline:4px solid var(--ink);outline-offset:2px}
+/* all-screens additions: forms, lists, charts, grids */
+.seg{display:flex;background:var(--raised);border-radius:12px;padding:4px;gap:4px}
+.seg span{flex:1;height:48px;display:grid;place-items:center;border-radius:8px;font-weight:700;font-size:16px}
+.seg .on{background:var(--navy);color:var(--on-brand)}
+.flabel{font-size:12px;font-weight:800;letter-spacing:.06em;color:var(--ink2);margin:14px 0 6px}
+.field{min-height:52px;border:2px solid var(--border);border-radius:12px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font-size:16px}
+.field .ph{color:var(--ink2)}
+.field .act{color:var(--navy);font-weight:700;font-size:15px}
+.secondary{margin-top:10px;height:52px;border-radius:12px;border:2px solid var(--navy);color:var(--navy);display:grid;place-items:center;font-weight:700;font-size:17px}
+.textbtn{margin-top:10px;height:48px;display:grid;place-items:center;font-weight:700;color:var(--ink2)}
+.row{display:flex;align-items:center;gap:12px;min-height:56px;border-bottom:1px solid var(--border);font-size:16px}
+.row .grow{flex:1;font-weight:600}
+.row .sub{display:block;font-size:13px;color:var(--ink2);font-weight:500}
+.ini{width:36px;height:36px;border-radius:9999px;background:var(--raised);display:grid;place-items:center;font-weight:700;font-size:14px;flex:none}
+.tag{font-size:12px;font-weight:700;padding:3px 8px;border-radius:9999px;border:1px solid var(--border);color:var(--ink2)}
+.sw{width:48px;height:28px;border-radius:9999px;background:var(--border);position:relative;flex:none}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:9999px;background:#FFFFFF}
+.sw.on{background:var(--navy)}
+.sw.on::after{left:23px}
+.swl{font-size:11px;color:var(--ink2);font-weight:700;text-align:center;width:48px}
+.sec{font-size:12px;font-weight:800;letter-spacing:.06em;color:var(--ink2);margin:14px 0 6px;display:flex;justify-content:space-between;align-items:center}
+.sec a{color:var(--navy);text-decoration:none;font-size:13px;letter-spacing:0}
+.fchips{display:flex;gap:6px;margin-bottom:6px;overflow:hidden}
+.fc{height:48px;padding:0 12px;border-radius:9999px;border:2px solid var(--navy);color:var(--navy);display:flex;align-items:center;font-weight:700;font-size:14px;flex:none}
+.fc.on{background:var(--navy);color:var(--on-brand)}
+.chart{background:var(--raised);border-radius:12px;padding:8px 6px 4px}
+.chart svg{display:block;width:100%;height:auto}
+.legend{display:flex;gap:14px;font-size:11px;color:var(--ink2);margin:4px 4px 0;font-weight:600}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+.pg{display:grid;grid-template-columns:44px repeat(5,48px);gap:3px}
+.pg .h{font-size:11px;font-weight:700;color:var(--navy);text-align:center;align-self:end;padding-bottom:2px}
+.pg .nm{font-size:14px;font-weight:700;display:flex;align-items:center}
+.gc{height:52px;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--on-rating)}
+.gc b{font-size:17px;font-weight:800;line-height:1.1}
+.gc i{font-style:normal;font-size:10px;font-weight:700}
+.gc.e{background:var(--raised);color:var(--ink2)}
+.since{font-size:13px;color:var(--ink2);font-weight:600;margin:12px 0 6px;display:flex;justify-content:space-between;align-items:center}
+.since b{color:var(--navy)}
+.back{font-size:17px;color:var(--navy);font-weight:700}
+.link{background:var(--raised);border-radius:12px;padding:14px;font-family:ui-monospace,Menlo,monospace;font-size:14px;margin:10px 0;word-break:break-all}
+.logo{width:96px;height:96px;border-radius:24px;border:2px dashed var(--ink2);display:grid;place-items:center;color:var(--ink2);font-size:13px;font-weight:700;margin:70px auto 20px}
+.center{text-align:center}
+.danger{color:var(--red);font-weight:700}
+.grp{font-size:18px;font-weight:800;margin:36px auto 14px;max-width:1500px;border-bottom:2px solid var(--border);padding-bottom:6px}
+.eg{font-size:13px;color:var(--ink2);font-weight:500;margin-left:auto}
+.cnt{font-weight:800;font-size:16px;font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+<h1>Setter Diary screens</h1>
+<p class="intro">Every v1 screen, for agreement before build. Content is realistic sample data. Switch your device to dark mode to see the dark theme. The documents (DESIGN.md, EXPERIENCE.md) win on any conflict with this mock.</p>
+<h2 class="grp">Setter</h2>
+<div class="screens">
+<!-- 1. Sessions -->
+<figure>
+<div class="phone">
+  <div class="status"><span>12:48</span><span>●●● 82%</span></div>
+  <div class="top"><div><div class="team">My team ▾</div><h2>Sessions</h2></div><div class="avatar">T</div></div>
+  <div class="content">
+    <div class="card">
+      <div class="card-h"><b>Sat 3 Oct · Game</b><span class="meta">29 sets</span></div>
+      <div class="prow"><span class="n">Mia</span><span class="meta">14 sets</span><span class="avg">2.4</span><div class="bar"><i class="c0" style="width:7%"></i><i class="c1" style="width:7%"></i><i class="c2" style="width:29%"></i><i class="c3" style="width:57%"></i></div></div>
+      <div class="prow"><span class="n">Josh</span><span class="meta">9 sets</span><span class="avg">1.8</span><div class="bar"><i class="c0" style="width:11%"></i><i class="c1" style="width:22%"></i><i class="c2" style="width:44%"></i><i class="c3" style="width:23%"></i></div></div>
+      <div class="prow"><span class="n">Leo</span><span class="meta">6 sets</span><span class="avg">2.2</span><div class="bar"><i class="c1" style="width:17%"></i><i class="c2" style="width:50%"></i><i class="c3" style="width:33%"></i></div></div>
+    </div>
+    <div class="card">
+      <div class="card-h"><b>Tue 29 Sep · Practice</b><span class="meta">41 sets</span></div>
+      <div class="prow"><span class="n">Mia</span><span class="meta">16 sets</span><span class="avg">2.1</span><div class="bar"><i class="c0" style="width:6%"></i><i class="c1" style="width:19%"></i><i class="c2" style="width:38%"></i><i class="c3" style="width:37%"></i></div></div>
+      <div class="prow"><span class="n">Josh</span><span class="meta">13 sets</span><span class="avg">1.5</span><div class="bar"><i class="c0" style="width:15%"></i><i class="c1" style="width:31%"></i><i class="c2" style="width:39%"></i><i class="c3" style="width:15%"></i></div></div>
+    </div>
+  </div>
+  <div class="fab">+</div>
+  <div class="tabs"><div class="on">Sessions</div><div>Progress</div><div>Team</div></div>
+</div>
+<figcaption><b>1 · Sessions.</b> Each session card shows every involved player's logs: set count, average and rating mix. Tap a player row to see their entries; tap the header to add or edit. Red <b>+</b> creates a session.</figcaption>
+</figure>
+<!-- 2. New session -->
+<figure>
+<div class="phone">
+  <div class="status"><span>12:48</span><span>●●● 82%</span></div>
+  <div class="top"><div><div class="team">My team ▾</div><h2>Sessions</h2></div><div class="avatar">T</div></div>
+  <div class="content"><div class="card" style="height:160px"></div></div>
+  <div class="dim"></div>
+  <div class="sheet">
+    <div class="grab"></div>
+    <h3>New session</h3>
+    <div class="flabel">DATE</div>
+    <div class="field"><span>Today · Sat 3 Oct</span><span class="act">Change</span></div>
+    <div class="flabel">TYPE</div>
+    <div class="seg"><span class="on">Game</span><span>Practice</span></div>
+    <div class="flabel">NOTES</div>
+    <div class="field"><span class="ph">Optional: opponent, drill focus</span></div>
+    <div class="primary">Next</div>
+  </div>
+</div>
+<figcaption><b>2 · New session.</b> Pop-up sheet from the red <b>+</b>. Date defaults to today; pick Game or Practice; notes are optional. <b>Next</b> opens Who played?</figcaption>
+</figure>
+<!-- 2. Who played? -->
+<figure>
+<div class="phone">
+  <div class="status"><span>12:49</span><span>●●● 82%</span></div>
+  <div class="top"><div><div class="team">My team ▾</div><h2>Sessions</h2></div><div class="avatar">T</div></div>
+  <div class="content"><div class="card" style="height:160px"></div></div>
+  <div class="dim"></div>
+  <div class="sheet">
+    <div class="grab"></div>
+    <h3>Who played?</h3>
+    <p class="meta" style="margin-bottom:4px">Sat 3 Oct · Game · position optional</p>
+    <div class="check sel"><span class="box on">✓</span>Mia</div>
+    <div class="posrow"><span class="pchip">Outside</span><span class="pchip on">Opposite</span><span class="pchip">Middle</span></div>
+    <div class="check sel"><span class="box on">✓</span>Josh</div>
+    <div class="posrow"><span class="pchip on">Outside</span><span class="pchip">Opposite</span><span class="pchip">Middle</span></div>
+    <div class="check sel"><span class="box on">✓</span>Leo</div>
+    <div class="posrow"><span class="pchip">Outside</span><span class="pchip">Opposite</span><span class="pchip on">Middle</span></div>
+    <div class="check"><span class="box"></span>Sam</div>
+    <div class="primary">Start logging</div>
+  </div>
+</div>
+<figcaption><b>3 · Who played?</b> Pick the players in this session and, optionally, their position for today. Positions are pre-filled from last time; Mia moves from outside to opposite today.</figcaption>
+</figure>
+<!-- 3. Logging (tally) -->
+<figure>
+<div class="phone">
+  <div class="status"><span>12:51</span><span>●●● 81%</span></div>
+  <div class="top"><div><div class="team">Sat 3 Oct</div><h2>Game</h2></div><span class="done">Done</span></div>
+  <div class="content" style="padding:0 12px">
+    <div class="ptabs"><div class="ptab on">Mia <small>14</small></div><div class="ptab">Josh <small>9</small></div><div class="ptab">Leo <small>6</small></div></div>
+    <div class="lbl">PASS</div>
+    <div style="display:flex;gap:8px"><span class="pass on">Good</span><span class="pass">OK</span><span class="pass">Poor</span></div>
+    <div class="lblrow"><div class="lbl">TAP TO ADD A SET</div><span class="fix">Fix</span></div>
+    <div class="tally">
+      <span></span><span class="th c0">0</span><span class="th c1">1</span><span class="th c2">2</span><span class="th c3">3</span>
+      <span class="rl">High outside</span><span class="cell z">+</span><span class="cell z">+</span><span class="cell">2</span><span class="cell">5</span>
+      <span class="rl">Back set</span><span class="cell z">+</span><span class="cell">1</span><span class="cell">1</span><span class="cell">2</span>
+      <span class="rl">Quick</span><span class="cell z">+</span><span class="cell z">+</span><span class="cell">1</span><span class="cell">1</span>
+      <span class="rl">Shoot</span><span class="cell z">+</span><span class="cell z">+</span><span class="cell z">+</span><span class="cell z">+</span>
+      <span class="rl">Pipe</span><span class="cell z">+</span><span class="cell z">+</span><span class="cell z">+</span><span class="cell z">+</span>
+    </div>
+  </div>
+  <div class="toast"><span>Mia · High outside · 3 · +1</span><b>Undo</b></div>
+  <div class="tabs" style="visibility:hidden"></div>
+</div>
+<figcaption><b>4 · Logging (tally).</b> Recall counts, not individual sets: choose the pass, then tap a set type × rating cell once per set. Counts shown are for the selected pass; the tab shows Mia's total. <b>Fix</b> switches taps to remove one.</figcaption>
+</figure>
+<!-- 5. Entry list -->
+<figure>
+<div class="phone">
+  <div class="status"><span>12:58</span><span>●●● 80%</span></div>
+  <div class="top"><div><div class="team">My team ▾</div><h2>Sessions</h2></div><div class="avatar">T</div></div>
+  <div class="content"><div class="card" style="height:160px"></div></div>
+  <div class="dim"></div>
+  <div class="sheet">
+    <div class="grab"></div>
+    <h3>Mia</h3>
+    <p class="meta" style="margin-bottom:6px">Sat 3 Oct · Game · Opposite · 14 sets · average 2.4</p>
+    <div class="sec">HIGH OUTSIDE · 7</div>
+    <div class="row"><span class="dot c3">3</span><span class="grow">Good pass</span><span class="cnt">×5</span><span class="meta">›</span></div>
+    <div class="row"><span class="dot c2">2</span><span class="grow">Good pass</span><span class="cnt">×2</span><span class="meta">›</span></div>
+    <div class="sec">BACK SET · 4</div>
+    <div class="row"><span class="dot c3">3</span><span class="grow">Good pass</span><span class="cnt">×2</span><span class="meta">›</span></div>
+    <div class="row"><span class="dot c2">2</span><span class="grow">OK pass</span><span class="cnt">×1</span><span class="meta">›</span></div>
+    <div class="row"><span class="dot c1">1</span><span class="grow">Poor pass</span><span class="cnt">×1</span><span class="meta">›</span></div>
+    <div class="sec">QUICK · 2 &nbsp;·&nbsp; PIPE · 1</div>
+    <div class="row"><span class="dot c3">3</span><span class="grow">Quick · Good pass</span><span class="cnt">×1</span><span class="meta">›</span></div>
+  </div>
+</div>
+<figcaption><b>5 · Entry list.</b> Tapping a player row on a session card opens their sets for that session, grouped by set type. Tap a line to edit or delete one of those sets.</figcaption>
+</figure>
+<!-- 6. Progress -->
+<figure>
+<div class="phone">
+  <div class="status"><span>9:12</span><span>●●● 95%</span></div>
+  <div class="top"><div><div class="team">My team ▾</div><h2>Progress</h2></div><div class="avatar">T</div></div>
+  <div class="content" style="padding:0 12px">
+    <div class="fchips"><span class="fc">All</span><span class="fc on">High outside</span><span class="fc">Back set</span><span class="fc">Quick</span></div>
+    <div class="chart">
+      <svg viewBox="0 0 296 144" role="img" aria-label="Weekly average rating and percent hittable, high outside">
+        <line x1="0" y1="120" x2="296" y2="120" style="stroke:var(--border)"/>
+        <rect x="8" y="58" width="32" height="62" rx="5" style="fill:var(--r2)"/>
+        <rect x="56" y="50" width="32" height="70" rx="5" style="fill:var(--r2)"/>
+        <rect x="104" y="47" width="32" height="73" rx="5" style="fill:var(--r2)"/>
+        <rect x="152" y="39" width="32" height="81" rx="5" style="fill:var(--r2)"/>
+        <rect x="200" y="36" width="32" height="84" rx="5" style="fill:var(--r2)"/>
+        <rect x="248" y="28" width="32" height="92" rx="5" style="fill:var(--r3)"/>
+        <g style="fill:var(--on-rating);font:800 11px system-ui" text-anchor="middle">
+          <text x="24" y="114">1.7</text><text x="72" y="114">1.9</text><text x="120" y="114">2.0</text><text x="168" y="114">2.2</text><text x="216" y="114">2.3</text><text x="264" y="114">2.5</text>
+        </g>
+        <polyline points="24,59.5 72,51.8 120,49.6 168,41.9 216,37.5 264,29.8" style="fill:none;stroke:var(--ink);stroke-width:3"/>
+        <g style="fill:var(--ink)"><circle cx="24" cy="59.5" r="3.5"/><circle cx="72" cy="51.8" r="3.5"/><circle cx="120" cy="49.6" r="3.5"/><circle cx="168" cy="41.9" r="3.5"/><circle cx="216" cy="37.5" r="3.5"/><circle cx="264" cy="29.8" r="3.5"/></g>
+        <text x="264" y="20" text-anchor="middle" style="fill:var(--ink);font:800 11px system-ui">82%</text>
+        <g style="fill:var(--ink2);font:600 10px system-ui" text-anchor="middle">
+          <text x="24" y="136">31/8</text><text x="72" y="136">7/9</text><text x="120" y="136">14/9</text><text x="168" y="136">21/9</text><text x="216" y="136">28/9</text><text x="264" y="136">5/10</text>
+        </g>
+      </svg>
+      <div class="legend"><span><i class="c2"></i>Average rating</span><span><i style="background:var(--ink)"></i>% hittable (2–3)</span></div>
+    </div>
+    <div class="since"><span>Hitter × set type</span><span>since <b>1 Aug ▾</b></span></div>
+    <div class="pg">
+      <span></span><span class="h">High</span><span class="h">Back</span><span class="h">Quick</span><span class="h">Shoot</span><span class="h">Pipe</span>
+      <span class="nm">Mia</span><span class="gc c3"><b>2.6</b><i>2.1→2.6</i></span><span class="gc c2"><b>2.2</b><i>1.4→2.2</i></span><span class="gc c2"><b>2.0</b><i>new</i></span><span class="gc e"><b>–</b></span><span class="gc c2"><b>1.5</b><i>1.0→1.5</i></span>
+      <span class="nm">Josh</span><span class="gc c2"><b>2.1</b><i>1.8→2.1</i></span><span class="gc c1"><b>1.3</b><i>1.2→1.3</i></span><span class="gc e"><b>–</b></span><span class="gc c2"><b>1.8</b><i>1.5→1.8</i></span><span class="gc e"><b>–</b></span>
+      <span class="nm">Leo</span><span class="gc e"><b>–</b></span><span class="gc e"><b>–</b></span><span class="gc c2"><b>2.2</b><i>1.6→2.2</i></span><span class="gc e"><b>–</b></span><span class="gc e"><b>–</b></span>
+    </div>
+  </div>
+  <div class="tabs"><div>Sessions</div><div class="on">Progress</div><div>Team</div></div>
+</div>
+<figcaption><b>6 · Progress.</b> Top: weekly consistency trend, filtered here to High outside. Columns show the average rating; the line shows % hittable. Below: the hitter × set-type grid. Each cell shows the current average and its change since the chosen date.</figcaption>
+</figure>
+</div>
+<h2 class="grp">Hitter</h2>
+<div class="screens">
+<!-- 7. Hitter Home -->
+<figure>
+<div class="phone">
+  <div class="status"><span>12:54</span><span>●●● 65%</span></div>
+  <div class="top"><div><div class="team">My team ▾</div><h2>Home</h2></div><div class="avatar">M</div></div>
+  <div class="content">
+    <div class="sec">TO RATE</div>
+    <div class="torate" style="margin-bottom:8px"><div class="meta">My team · Sat 3 Oct · Game</div><div class="q" style="margin:4px 0 0">Thang's sets</div></div>
+    <div class="torate"><div class="meta">Uni social · Thu 1 Oct · Practice</div><div class="q" style="margin:4px 0 0">Alex's sets</div></div>
+    <div class="sec">SETS YOU RECEIVED</div>
+    <div class="chart">
+      <svg viewBox="0 0 296 144" role="img" aria-label="Weekly average rating of sets received">
+        <line x1="0" y1="120" x2="296" y2="120" style="stroke:var(--border)"/>
+        <rect x="8" y="47" width="32" height="73" rx="5" style="fill:var(--r2)"/>
+        <rect x="56" y="43" width="32" height="77" rx="5" style="fill:var(--r2)"/>
+        <rect x="104" y="50" width="32" height="70" rx="5" style="fill:var(--r2)"/>
+        <rect x="152" y="36" width="32" height="84" rx="5" style="fill:var(--r2)"/>
+        <rect x="200" y="32" width="32" height="88" rx="5" style="fill:var(--r2)"/>
+        <rect x="248" y="32" width="32" height="88" rx="5" style="fill:var(--r2)"/>
+        <g style="fill:var(--on-rating);font:800 11px system-ui" text-anchor="middle">
+          <text x="24" y="114">2.0</text><text x="72" y="114">2.1</text><text x="120" y="114">1.9</text><text x="168" y="114">2.3</text><text x="216" y="114">2.4</text><text x="264" y="114">2.4</text>
+        </g>
+        <g style="fill:var(--ink2);font:600 10px system-ui" text-anchor="middle">
+          <text x="24" y="136">31/8</text><text x="72" y="136">7/9</text><text x="120" y="136">14/9</text><text x="168" y="136">21/9</text><text x="216" y="136">28/9</text><text x="264" y="136">5/10</text>
+        </g>
+      </svg>
+      <div class="legend"><span><i class="c2"></i>Average rating of sets to you, this team</span></div>
+    </div>
+  </div>
+  <div class="tabs"><div class="on">Home</div><div>Setters</div><div>Team</div></div>
+</div>
+<figcaption><b>7 · Hitter Home (Mia).</b> "To rate" cards from all of Mia's teams, each labelled with its team. Tapping the Uni social card switches to that team. Below: the quality of sets Mia received, week by week.</figcaption>
+</figure>
+<!-- 4. Hitter rating -->
+<figure>
+<div class="phone">
+  <div class="status"><span>12:55</span><span>●●● 64%</span></div>
+  <div class="top"><div><div class="team">My team ▾</div><h2>Home</h2></div><div class="avatar">M</div></div>
+  <div class="content">
+    <div class="torate"><div class="meta">To rate</div><div class="q" style="margin-bottom:0">Sat 3 Oct · Game with Thang</div></div>
+  </div>
+  <div class="dim"></div>
+  <div class="sheet">
+    <div class="grab"></div>
+    <p class="meta">Sat 3 Oct · Game</p>
+    <div class="q">How comfortable were Thang's sets to hit today?</div>
+    <div class="ratings">
+      <div class="rb c0"><b>0</b><span>Unhittable</span></div>
+      <div class="rb c1"><b>1</b><span>Free ball</span></div>
+      <div class="rb c2 sel"><b>2</b><span>Adjust</span></div>
+      <div class="rb c3"><b>3</b><span>Full swing</span></div>
+    </div>
+    <div class="primary">Save rating</div>
+  </div>
+</div>
+<figcaption><b>8 · Hitter rating (Mia).</b> A "To rate" card appears as soon as Thang creates the session with Mia in it. One overall rating per session, per setter.</figcaption>
+</figure>
+<!-- 9. Hitter Setters tab -->
+<figure>
+<div class="phone">
+  <div class="status"><span>19:30</span><span>●●● 41%</span></div>
+  <div class="top"><div><div class="team">My team ▾</div><h2>Setters</h2></div><div class="avatar">M</div></div>
+  <div class="content" style="padding:0 12px">
+    <div class="fchips"><span class="fc on">Thang</span><span class="fc">Kai</span></div>
+    <div class="sec">THANG'S CONSISTENCY · ALL SET TYPES</div>
+    <div class="chart">
+      <svg viewBox="0 0 296 144" role="img" aria-label="Thang's weekly average rating and percent hittable">
+        <line x1="0" y1="120" x2="296" y2="120" style="stroke:var(--border)"/>
+        <rect x="8" y="62" width="32" height="58" rx="5" style="fill:var(--r2)"/>
+        <rect x="56" y="58" width="32" height="62" rx="5" style="fill:var(--r2)"/>
+        <rect x="104" y="54" width="32" height="66" rx="5" style="fill:var(--r2)"/>
+        <rect x="152" y="50" width="32" height="70" rx="5" style="fill:var(--r2)"/>
+        <rect x="200" y="47" width="32" height="73" rx="5" style="fill:var(--r2)"/>
+        <rect x="248" y="43" width="32" height="77" rx="5" style="fill:var(--r2)"/>
+        <g style="fill:var(--on-rating);font:800 11px system-ui" text-anchor="middle">
+          <text x="24" y="114">1.6</text><text x="72" y="114">1.7</text><text x="120" y="114">1.8</text><text x="168" y="114">1.9</text><text x="216" y="114">2.0</text><text x="264" y="114">2.1</text>
+        </g>
+        <polyline points="24,64.5 72,59 120,54.6 168,50.2 216,45.8 264,40.3" style="fill:none;stroke:var(--ink);stroke-width:3"/>
+        <g style="fill:var(--ink2);font:600 10px system-ui" text-anchor="middle">
+          <text x="24" y="136">31/8</text><text x="72" y="136">7/9</text><text x="120" y="136">14/9</text><text x="168" y="136">21/9</text><text x="216" y="136">28/9</text><text x="264" y="136">5/10</text>
+        </g>
+      </svg>
+      <div class="legend"><span><i class="c2"></i>Average rating</span><span><i style="background:var(--ink)"></i>% hittable</span></div>
+    </div>
+    <div class="since"><span>Your row in Thang's grid</span><span>since <b>1 Aug ▾</b></span></div>
+    <div class="pg">
+      <span></span><span class="h">High</span><span class="h">Back</span><span class="h">Quick</span><span class="h">Shoot</span><span class="h">Pipe</span>
+      <span class="nm">You</span><span class="gc c3"><b>2.6</b><i>2.1→2.6</i></span><span class="gc c2"><b>2.2</b><i>1.4→2.2</i></span><span class="gc c2"><b>2.0</b><i>new</i></span><span class="gc e"><b>–</b></span><span class="gc c2"><b>1.5</b><i>1.0→1.5</i></span>
+    </div>
+    <p class="meta" style="margin-top:10px">Other hitters' rows are private to Thang.</p>
+  </div>
+  <div class="tabs"><div>Home</div><div class="on">Setters</div><div>Team</div></div>
+</div>
+<figcaption><b>9 · Setters (Mia).</b> Pick one of the team's setters to see their consistency trend, plus only Mia's own row of that setter's grid.</figcaption>
+</figure>
+</div>
+<h2 class="grp">Team and account</h2>
+<div class="screens">
+<!-- 10. Log in -->
+<figure>
+<div class="phone">
+  <div class="status"><span>8:04</span><span>●●● 99%</span></div>
+  <div class="content">
+    <div class="logo" style="margin-top:50px">Logo</div>
+    <h2 class="center" style="font-size:26px;font-weight:800;margin-bottom:24px">Setter Diary</h2>
+    <div class="flabel">EMAIL</div>
+    <div class="field"><span>thang@example.com</span></div>
+    <div class="flabel">PASSWORD</div>
+    <div class="field"><span>••••••••••</span><span class="act">Show</span></div>
+    <div class="textbtn" style="justify-items:end;color:var(--navy)">Forgot password?</div>
+    <div class="primary">Log in</div>
+    <div class="textbtn">New here? <span style="color:var(--navy);margin-left:4px">Create an account</span></div>
+  </div>
+</div>
+<figcaption><b>10 · Log in.</b> Email and password, with show/hide password and a reset link. Users stay logged in on their phone, so after courtside sessions the app opens straight to their home tab.</figcaption>
+</figure>
+
+<!-- 11. Create account (from invite) -->
+<figure>
+<div class="phone">
+  <div class="status"><span>18:30</span><span>●●● 77%</span></div>
+  <div class="top"><span class="back">‹ Log in</span></div>
+  <div class="content">
+    <h2 style="font-size:22px;margin-bottom:10px">Create your account</h2>
+    <div class="torate" style="margin-bottom:6px"><div class="meta">Invite</div><div class="q" style="margin:2px 0 0;font-size:16px">You're joining My team</div></div>
+    <div class="flabel">NAME</div>
+    <div class="field"><span>Sam</span></div>
+    <div class="flabel">EMAIL</div>
+    <div class="field"><span class="ph">you@example.com</span></div>
+    <div class="flabel">PASSWORD</div>
+    <div class="field"><span class="ph">At least 8 characters</span><span class="act">Show</span></div>
+    <div class="row" style="border:none;align-items:flex-start;min-height:0;margin-top:12px;font-size:13px;line-height:1.4"><span class="box on" style="width:24px;height:24px;font-size:14px;flex:none">✓</span><span class="meta">I'm 18 or older and agree to the privacy policy. My stats are visible to my team as described there.</span></div>
+    <div class="primary">Create account</div>
+  </div>
+</div>
+<figcaption><b>11 · Create account.</b> Opened from an invite link, so the team is shown and the name is pre-filled from the roster. Without an invite, the card is hidden and Welcome (screen 12) follows. The checkbox covers the 18+ and privacy terms.</figcaption>
+</figure>
+
+<!-- 12. Welcome / no team -->
+<figure>
+<div class="phone">
+  <div class="status"><span>8:05</span><span>●●● 99%</span></div>
+  <div class="content">
+    <div class="logo">Logo</div>
+    <h2 class="center" style="font-size:26px;font-weight:800">Setter Diary</h2>
+    <p class="center meta" style="font-size:15px;margin:8px 16px 0;line-height:1.4">You're not on a team yet.</p>
+    <div style="margin-top:180px">
+      <div class="primary">Create a team</div>
+      <div class="secondary">Join with an invite link</div>
+    </div>
+  </div>
+</div>
+<figcaption><b>12 · Welcome, no team.</b> Shown after sign-up when the account isn't on a team. Opening an invite link skips this screen (see screen 11). The logo is a placeholder; it's designed separately.</figcaption>
+</figure>
+
+<!-- 13. Team (setter) -->
+<figure>
+<div class="phone">
+  <div class="status"><span>17:40</span><span>●●● 70%</span></div>
+  <div class="top"><div><div class="team">My team ▾</div><h2>Team</h2></div><div class="avatar">T</div></div>
+  <div class="content">
+    <div class="row"><span class="grow">Team stats</span><span class="meta">›</span></div>
+    <div class="sec">SET TYPES<a>+ Add</a></div>
+    <div class="fchips" style="flex-wrap:wrap"><span class="fc">High outside</span><span class="fc">Back set</span><span class="fc">Quick</span><span class="fc">Shoot</span><span class="fc">Pipe</span></div>
+    <div class="sec">PLAYERS · 7<span class="swl">Team view</span></div>
+    <div class="row"><span class="ini">T</span><span class="grow">Thang<span class="sub">Setter · you</span></span><span class="sw on"></span></div>
+    <div class="row"><span class="ini">K</span><span class="grow">Kai<span class="sub">Setter</span></span><span class="sw"></span></div>
+    <div class="row"><span class="ini">M</span><span class="grow">Mia<span class="sub">Hitter</span></span><span class="sw"></span></div>
+    <div class="row"><span class="ini">J</span><span class="grow">Josh<span class="sub">Hitter</span></span><span class="sw"></span></div>
+    <div class="row"><span class="ini">S</span><span class="grow">Sam<span class="sub">Invite sent</span></span><span class="tag">Resend</span></div>
+  </div>
+  <div class="fab">+</div>
+  <div class="tabs"><div>Sessions</div><div>Progress</div><div class="on">Team</div></div>
+</div>
+<figcaption><b>13 · Team (setter).</b> <b>Team stats</b> (only for members who have Team view), the editable set types, then the roster with each member's role. Setters turn on <b>Team view</b> to give a member access to all team stats. Red <b>+</b> adds a player.</figcaption>
+</figure>
+
+<!-- 14. Add player + invite -->
+<figure>
+<div class="phone">
+  <div class="status"><span>17:41</span><span>●●● 70%</span></div>
+  <div class="top"><div><div class="team">My team ▾</div><h2>Team</h2></div><div class="avatar">T</div></div>
+  <div class="content"><div class="card" style="height:200px"></div></div>
+  <div class="dim"></div>
+  <div class="sheet">
+    <div class="grab"></div>
+    <h3>Add player</h3>
+    <div class="flabel">NAME</div>
+    <div class="field"><span>Sam</span></div>
+    <div class="sec" style="margin-top:18px">INVITE LINK</div>
+    <p class="meta" style="font-size:14px">Sam is on the roster. Send this link so Sam can create an account and join.</p>
+    <div class="link">setter-diary.example/join/7KQ2M4</div>
+    <div class="primary">Share link</div>
+    <div class="textbtn">Done</div>
+  </div>
+</div>
+<figcaption><b>14 · Add player.</b> Name only, since positions are chosen per session. After <b>Add player</b>, the sheet shows the invite link to share. If Sam already has an account, the link adds this team to it.</figcaption>
+</figure>
+
+<!-- 15. Team stats -->
+<figure>
+<div class="phone">
+  <div class="status"><span>21:02</span><span>●●● 33%</span></div>
+  <div class="top"><span class="back">‹ Team</span><div class="avatar">T</div></div>
+  <div class="content" style="padding:0 12px">
+    <h2 style="font-size:22px;margin-bottom:8px">Team stats</h2>
+    <div class="fchips"><span class="fc">Thang</span><span class="fc on">Kai</span></div>
+    <div class="since"><span>Kai's diary · hitter × set type</span><span>since <b>1 Aug ▾</b></span></div>
+    <div class="pg">
+      <span></span><span class="h">High</span><span class="h">Back</span><span class="h">Quick</span><span class="h">Shoot</span><span class="h">Pipe</span>
+      <span class="nm">Mia</span><span class="gc c3"><b>2.6</b><i>2.1→2.6</i></span><span class="gc c2"><b>2.2</b><i>1.4→2.2</i></span><span class="gc c2"><b>2.0</b><i>new</i></span><span class="gc e"><b>–</b></span><span class="gc c2"><b>1.5</b><i>1.0→1.5</i></span>
+      <span class="nm">Josh</span><span class="gc c2"><b>2.1</b><i>1.8→2.1</i></span><span class="gc c1"><b>1.3</b><i>1.2→1.3</i></span><span class="gc e"><b>–</b></span><span class="gc c2"><b>1.8</b><i>1.5→1.8</i></span><span class="gc e"><b>–</b></span>
+      <span class="nm">Leo</span><span class="gc e"><b>–</b></span><span class="gc e"><b>–</b></span><span class="gc c2"><b>2.2</b><i>1.6→2.2</i></span><span class="gc e"><b>–</b></span><span class="gc e"><b>–</b></span>
+      <span class="nm">Ava</span><span class="gc c2"><b>1.9</b><i>1.7→1.9</i></span><span class="gc e"><b>–</b></span><span class="gc e"><b>–</b></span><span class="gc e"><b>–</b></span><span class="gc c1"><b>1.2</b><i>new</i></span>
+      <span class="nm">Sam</span><span class="gc e"><b>–</b></span><span class="gc e"><b>–</b></span><span class="gc c3"><b>2.5</b><i>new</i></span><span class="gc e"><b>–</b></span><span class="gc e"><b>–</b></span>
+    </div>
+    <p class="meta" style="margin-top:12px">The consistency trend for the chosen setter sits above this grid; scroll up to see it.</p>
+  </div>
+</div>
+<figcaption><b>15 · Team stats.</b> Only for members a setter has given Team view. Pick any setter on the team to see their full diary: trend and every hitter's row. Nobody outside the team can open it.</figcaption>
+</figure>
+
+<!-- 16. Team switcher -->
+<figure>
+<div class="phone">
+  <div class="status"><span>18:20</span><span>●●● 60%</span></div>
+  <div class="top"><div><div class="team">My team ▾</div><h2>Sessions</h2></div><div class="avatar">T</div></div>
+  <div class="content"><div class="card" style="height:200px"></div></div>
+  <div class="dim"></div>
+  <div class="sheet">
+    <div class="grab"></div>
+    <h3>Your teams</h3>
+    <div class="row"><span class="ini">MT</span><span class="grow">My team<span class="sub">Setter</span></span><span style="color:var(--navy);font-weight:800;font-size:20px">✓</span></div>
+    <div class="row"><span class="ini">US</span><span class="grow">Uni social<span class="sub">Hitter · 1 to rate</span></span></div>
+    <div class="row"><span class="ini">+</span><span class="grow" style="color:var(--navy)">Join another team</span></div>
+    <div class="row" style="border-bottom:none"><span class="ini">+</span><span class="grow" style="color:var(--navy)">Create a team</span></div>
+  </div>
+</div>
+<figcaption><b>16 · Team switcher.</b> Tap the team name in the header. Each team shows your role there; switching to Uni social changes the tabs to the hitter set.</figcaption>
+</figure>
+
+<!-- 17. Settings -->
+<figure>
+<div class="phone">
+  <div class="status"><span>18:22</span><span>●●● 60%</span></div>
+  <div class="top"><span class="back">‹ Back</span></div>
+  <div class="content">
+    <h2 style="font-size:22px;margin-bottom:12px">Settings</h2>
+    <div class="row"><span class="avatar">T</span><span class="grow">Thang<span class="sub">2 teams</span></span></div>
+    <div class="sec">YOUR DATA</div>
+    <div class="row"><span class="grow">Export my data<span class="sub">CSV file you can open in a spreadsheet app</span></span><span class="meta">›</span></div>
+    <div class="sec">TEAMS</div>
+    <div class="row"><span class="grow">Join another team</span><span class="meta">›</span></div>
+    <div class="sec">ACCOUNT</div>
+    <div class="row"><span class="grow">Log out</span></div>
+    <div class="row"><span class="grow danger">Delete account</span></div>
+    <p class="meta" style="margin-top:10px;line-height:1.4">Deleting your account keeps your stats with your teams, anonymised. A confirmation sheet explains this before anything is deleted.</p>
+  </div>
+</div>
+<figcaption><b>17 · Settings.</b> Opened from the profile button. CSV export, joining another team, and account deletion (stats stay with the team, anonymised).</figcaption>
+</figure>
+</div>
+</body>
+</html>
