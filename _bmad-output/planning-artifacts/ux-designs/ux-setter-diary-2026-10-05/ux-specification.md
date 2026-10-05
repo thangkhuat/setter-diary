@@ -19,24 +19,24 @@ Usage context: indoor gym, sweaty hands, morning or noon sessions. A game runs a
 
 | Surface | Reached from | Who | Purpose |
 |---|---|---|---|
-| Log in | App open when logged out | All | Email and password [ASSUMPTION: sign-in method open to architecture]; forgot-password link; link to create an account. Users stay logged in. |
-| Create account | "Create an account" link, or an invite link | All | Name, email, password; 18+ and privacy-policy checkbox [ASSUMPTION]; separate AI-processing consent checkbox (required, FR-14). From an invite, shows the team and pre-fills the name. |
+| Log in | App open when logged out | All | **Continue with Google** or **Use a passkey**; no passwords. "Lost access? Ask your team manager to resend your invite." Users stay logged in |
+| Create account | "Create an account" link, or an invite link | All | Continue with Google or create a passkey, then display name; required checkboxes: 18+ and privacy policy, and AI processing. From an invite, shows the team and pre-fills the name. iPhone users then see an Add-to-Home-Screen tip |
 | Welcome (no team) | After sign-up without an invite | All | Create a team, or join with an invite link |
 | Sessions | Tab (setter home) | Setter | Session cards, newest first; each card shows every involved player's logs for that session; `+` creates a session |
 | New session sheet | `+` on Sessions | Setter | Date (default today), Game or Practice, notes (optional) |
 | Who played? sheet | After New session | Setter | Multi-select roster players in this session, with an optional position for each (this session only) |
 | Logging | New session, or tapping a session card | Setter | Log sets per player (FR-5) |
-| Progress | Tab | Setter | Consistency trend (FR-7) and hitter × set-type grid (FR-8); Claude button bottom-right |
-| Claude discussion | Claude button on Progress | Setter | AI discussion about the setter's own data (FR-14); past discussions; connect prompt if no Claude account |
+| Progress | Tab | Setter | Consistency trend (FR-7) and hitter × set-type grid (FR-8); Ask AI button bottom-right |
+| AI discussion | Ask AI button on Progress | Setter | AI discussion about the setter's own data (FR-14); past discussions; daily-limit states |
 | Team | Tab | All | Roster with each member's role and a Manager tag. Team managers add players with `+`, edit set types, grant team-wide view, and make others managers; everyone else sees it read-only |
-| Member sheet | Tap a roster row (managers only) | Team manager | Team manager toggle; remove from team. (Team view is also switchable inline on the roster.) |
+| Member sheet | Tap a roster row (managers only) | Team manager | Setter, Hitter and Team manager toggles; remove from team. (Team view is also switchable inline on the roster.) |
 | Add player sheet | `+` on Team | Team manager | Name only (positions vary between sessions); produces invite link |
 | Set types | Team tab section | Team manager | Edit the team's set-type list (FR-3); `+` adds a type |
 | Home | Tab (hitter home) | Hitter | "To rate" cards + own received-set progress (FR-9) |
 | Rate session sheet | "To rate" card or notification | Hitter | One overall 0–3 rating for the session's sets from that setter (FR-6) |
 | Setters | Tab | Hitter | Each team setter's trend + the hitter's own grid row |
 | Team stats | Team tab, if granted | Team-wide view holders | All setters' diaries and all hitters' data (FR-11) |
-| Settings | Profile button in header | All | Claude account connect/disconnect (setters); export CSV; delete account; join another team via invite |
+| Settings | Profile button in header | All | Export CSV; delete account; join another team via invite |
 
 → Visual reference: `mockups/screens.html` (all 18 v1 screens). These documents win on any conflict with the mock.
 
@@ -80,16 +80,16 @@ Behavioral. Visual specs live in `design-system.md` (Components).
 | "To rate" card | Hitter Home | One per unrated session from each setter; tap opens Rate session sheet. |
 | Progress grid | Progress, Setters, Team stats | Hitter × set-type averages for one setter. Hitter sees only their own row (PRD). Date picker sets the "since" comparison; each cell shows before → now. |
 | Trend chart | Progress, Setters, Team stats | Weekly average rating and % hittable for one setter; set-type filter chips above it (default: all types). |
-| Claude button | Progress (setters only) | Small round button, bottom-right. Tap opens Claude discussion. Not shown to hitters. |
-| Claude discussion | Full screen from Claude button | Claude opens with 2–3 observations drawn from the setter's data (for example, lowest hitter × set-type cell, trend direction), then the setter types replies. "Past discussions" lists saved conversations, private to the setter. |
+| Ask AI button | Progress (setters only) | Small round button with a sparkle icon, bottom-right. Tap opens the AI discussion. Not shown to hitters. |
+| AI discussion | Full screen from Ask AI button | The AI opens with 2–3 observations drawn from the setter's data (for example, lowest hitter × set-type cell, trend direction), then the setter types replies. "Past discussions" lists saved conversations, private to the setter. |
 
 ## State Patterns
 
 | State | Surface | Treatment |
 |---|---|---|
 | No team | Welcome | Choose: create a team or join with an invite link. |
-| Wrong email or password | Log in | "That email and password don't match." Fields keep their values. |
-| Forgot password | Log in | Reset link sent by email; "Check your email for a reset link." |
+| Sign-in failed or cancelled | Log in | "Sign-in didn't finish. Try again." Both sign-in buttons stay available. |
+| Lost access | Log in | "Ask your team manager to resend your invite." The manager issues a recovery invite from the member sheet. |
 | Invite link expired or used | Create account, join | "This invite has expired. Ask your team manager for a new one." |
 | Empty roster | Team, New session | "Add your teammates to start logging." `+` highlighted. |
 | No sessions | Sessions | "After your next game or practice, tap + to log it." |
@@ -104,10 +104,10 @@ Behavioral. Visual specs live in `design-system.md` (Components).
 | Not a team manager | Team | Roster and set types read-only: no `+`, no Team view switches, no + Add on set types. |
 | Last manager | Member sheet | The only manager can't remove their own manager role or leave until another member is made manager. |
 | Network error | Any save | "Couldn't save — check your connection." Entry kept on screen to retry. |
-| Account deletion | Settings | Confirm sheet stating: stats stay with the team, anonymised; Claude discussions are deleted. |
-| No Claude account | Claude discussion | Explains what Claude does with the setter's data, then "Connect Claude account" → Settings. |
-| Claude thinking | Claude discussion | Typing indicator; the setter can leave and come back, the reply is saved. |
-| Claude error or limit reached | Claude discussion | Plain message naming the problem (for example, the Claude account's limit); history stays visible. |
+| Account deletion | Settings | Confirm sheet stating: stats stay with the team, anonymised; your AI discussions are deleted, and your name is removed from other people's saved discussions. |
+| Daily limit (you) | AI discussion | "You've used today's 2 AI discussions. Back tomorrow." Past discussions stay readable. |
+| AI thinking | AI discussion | Typing indicator; the setter can leave and come back, the reply is saved. |
+| Daily limit (app) or AI error | AI discussion | "AI is resting for today. Try again tomorrow." Also used when a discussion reaches its follow-up cap ("Start a new discussion tomorrow"). History stays visible. |
 
 ## Interaction Primitives
 
@@ -165,11 +165,11 @@ Edge: Thang hasn't created the session yet → no card yet; it appears once the 
 1. Thang opens **Progress**, filters the trend to High outside: hittable sets rising three weeks in a row.
 2. On the grid, Thang sets "since" to 1 August.
 3. Back sets to Mia read 1.4 → 2.2; back sets to Josh are still the lowest cell at 1.3.
-4. Thang taps the **Claude** button. Claude opens: "Back sets to Josh are your lowest combination (1.3), and most came off OK or poor passes."
-5. Thang asks how to work on it; Claude answers using Thang's data.
+4. Thang taps the **Ask AI** button. The AI opens: "Back sets to Josh are your lowest combination (1.3), and most came off OK or poor passes."
+5. Thang asks how to work on it; the AI answers using Thang's data.
 6. **Climax:** Thang leaves with one concrete focus for Tuesday's practice, saved under Past discussions.
 
-Thin data: fewer than 2 weeks logged → trend shows "Not enough data yet". No Claude account → the Claude button opens the connect prompt.
+Thin data: fewer than 2 weeks logged → trend shows "Not enough data yet". Daily limit used → the Ask AI button opens the limit message.
 
 ### Flow 4 — Add a new teammate (Thang, team manager, before practice)
 
@@ -189,7 +189,6 @@ Edge: Sam already plays for another team → the link adds this team to Sam's ex
 
 ## PRD Feedback
 
-All items raised here were absorbed into the PRD on 2026-10-05 (FR-4, FR-6, FR-14, FR-15, FR-16). Open for the spec or architecture:
+All items raised here were absorbed into the PRD on 2026-10-05 (FR-4, FR-6, FR-14, FR-15, FR-16). Later changes from the architecture step:
 
-- Claude account connection: consumer Claude plans may not be usable by third-party apps (see PRD Open Questions).
-- Use of the Claude name and mark must follow Anthropic's brand guidelines.
+- RFC-001 (accepted): free AI via Cloudflare with an Ask AI button and daily limits; Google or passkey sign-in; manager-set setter and hitter roles.
