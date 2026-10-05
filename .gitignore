@@ -1,0 +1,3 @@
+# Claude Code: personal settings and machine-specific skill links
+.claude/settings.local.json
+.claude/skills/
