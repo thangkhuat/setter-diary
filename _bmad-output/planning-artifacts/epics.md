@@ -76,7 +76,7 @@ From `architecture.md` (AD-1 to AD-22) and the ADRs:
 - **Stats (AD-8, AD-9, AD-17, AD-20, AD-21):** `set_entries` and `hitter_session_ratings` tables; rating lock derived from `nextSessionWith`; pending list from `GET /api/me/ratings/pending`; all aggregation only in `progress` via declared public columns; set types archived, never deleted; one idempotent `POST` per tally tap with client UUIDv7; Fix mode deletes the newest matching row.
 - **AI (AD-10):** `AiGateway` port, Workers AI via AI Gateway with body logging off; model IDs in config (`AI_MODEL_PRIMARY`, `AI_MODEL_FALLBACK`) chosen by a bake-off (Gemma 4 26B, GLM 4.7-Flash, gpt-oss-20b/120b, Llama 3.3 70B fp8-fast); per-user UTC-day quota with conditional update and refund on error; `ai_usage_daily` neuron estimate drives fallback; `AI_MAX_TURNS`; messages stored with labels and a label → member map; input built by `progress` with consent exclusions.
 - **Identity (AD-11, AD-12):** Better Auth on D1 for users, sessions, Google and passkeys only; synthetic `<userId>@users.invalid` for passkey-only users; cookie cache; consents in app-owned `user_consents`; dev-login adapter for local and preview (refused in production); invites hashed, `kind: join | recovery`, 7-day expiry, preview sets an httpOnly cookie, conditional redeem with `CONSENT_REQUIRED`, `ALREADY_IN_TEAM`, `MEMBER_ALREADY_LINKED`.
-- **Free plan (AD-13):** stay within Workers Free limits; map limit errors to `503 SERVICE_BUSY`; Turnstile on team creation and invite preview plus one rate-limiting rule [assumption].
+- **Free plan (AD-13):** stay within Workers Free limits; map limit errors to `503 SERVICE_BUSY`; Turnstile on team creation and invite preview plus the Workers Rate Limiting binding inside the Worker [assumption until Story 1.1 confirms it on the Free plan].
 - **Time (AD-15):** UTC storage; team IANA time zone (default `Australia/Sydney`); `session_date` and stored `iso_week`; before = `< since`, now = `≥ since`; "today" supplied by the API.
 - **Notifications (AD-16):** Web Push via `Notifier` port, VAPID secrets; `ParticipantAdded` domain event → one push per (session, linked participant), logged in `notification_log`.
 - **Export (AD-22):** one CSV per membership: sets the user gave as setter, hitter ratings the user gave, and sets received aggregated as their own grid row.
@@ -142,7 +142,7 @@ Delivery order: 1 → 2 → 3 → field-trial checkpoint → 4 → 5 → 6 → 7
 - Every acceptance criterion maps to at least one automated test (Vitest unit, Workers-runtime integration, or end-to-end), unless it is marked [manual check] with how it is verified.
 
 ### Epic 1: Sign in and set up my team
-A setter signs in with Google or a passkey (all consents recorded at sign-up), creates a team, adds teammates by name, edits set types and installs the app. Includes the foundation: starter template and delta, CI with boundary check, design tokens and app shell, shared visibility function with permissions-matrix tests, sign-in CPU spike, PWA install and the logo.
+A setter signs in with Google or a passkey (all consents recorded at sign-up), creates a team, adds teammates by name, edits set types and installs the app. Includes the foundation: starter template and delta, CI with boundary check, design tokens and app shell, shared visibility function with permissions-matrix tests, sign-in CPU spike, PWA install, the logo and the privacy policy page.
 **FRs covered:** FR1, FR2, FR3, FR10
 
 ### Epic 2: Log a session after training
@@ -186,10 +186,11 @@ So that every later story builds on a deployed, rule-checked app that costs noth
 
 **Acceptance Criteria:**
 
-**Given** a fresh repository
-**When** the project is created with `npm create cloudflare@latest -- --template=cloudflare/templates/vite-react-template` and the starter delta is applied
+**Given** this repository, which already holds the planning documents (`_bmad/`, `_bmad-output/`, `docs/`, `.agents/`, `README.md`, `.gitignore`)
+**When** the starter is created in a temporary folder with `npm create cloudflare@latest -- --template=cloudflare/templates/vite-react-template` (without its own git repository or a deploy), its files are moved into the repository root, and the starter delta is applied
 **Then** the SPA lives in `web/`, the Worker in `worker/`, core in `src/core/`, adapters in `src/adapters/` and contracts in `src/contracts/`, with `wrangler.jsonc`, a current `compatibility_date`, `assets.run_worker_first: ["/api/*"]`, Vite 8 with `@vitejs/plugin-react` 6, TypeScript 6.0.3 and Node 24 in `.nvmrc`
 **And** all versions match the architecture Stack table
+**And** no existing file is overwritten: the starter's `.gitignore` entries are merged into the existing one, the existing `README.md` is kept and gains a short section on running the app, and the planning folders are unchanged
 
 **Given** the dependency-cruiser configuration for AD-1 and AD-2 (layer table and slice order)
 **When** CI runs
@@ -204,6 +205,11 @@ So that every later story builds on a deployed, rule-checked app that costs noth
 **When** CI runs
 **Then** migrations are applied to the production D1 (created with `--location=oc`) and the Worker is deployed to `*.workers.dev`
 **And** `GET /api/health` returns `200` with the app version
+
+**Given** the deployed Worker on the Workers Free plan at its `*.workers.dev` address
+**When** a test route guarded by the Workers Rate Limiting binding is called faster than its limit
+**Then** the extra calls are refused with `429`, and the result is recorded in the story notes [manual check: calls against the deployed Worker]
+**And** if the binding is not available on the Free plan, the owner chooses the direction before Story 1.5 starts (a best-effort limit per Worker isolate, or an RFC), and AD-13 and Stories 1.5, 2.3 and 4.2 are updated to match
 
 **Given** the repository
 **Then** `docs/runbook.md` covers deploy, `wrangler rollback`, Time Travel restore (7 days on Free) and secret rotation
@@ -265,6 +271,7 @@ So that getting in at the gym is one tap.
 **When** they submit
 **Then** a display name is required and both required checkboxes (18+ and privacy policy; AI processing) must be ticked
 **And** each consent is stored with a timestamp in the app-owned `user_consents` table (owner: account), readable only via `account.getConsents(userIds)`
+**And** the words "privacy policy" in the first checkbox link to `/privacy` (Story 1.10, which must be live before anyone other than the owner signs up)
 
 **Given** sign-in is cancelled or fails
 **Then** "Sign-in didn't finish. Try again." is shown and the sign-in buttons stay available
@@ -334,7 +341,7 @@ So that I have a private space for my team's data.
 **And** the app opens on the setter tabs for that team
 
 **Given** team creation is an entry point open to any signed-in user
-**Then** it is protected by one Cloudflare rate-limiting rule (Turnstile is added in Story 4.2)
+**Then** it is limited per user by the Workers Rate Limiting binding, as confirmed in Story 1.1 (Turnstile is added in Story 4.2)
 
 **Given** any route under `/api/teams/:teamId/...`
 **When** the session user has no active member in that team
@@ -391,6 +398,10 @@ So that I can log sets to them even before they sign up.
 **When** a manager removes them from the team
 **Then** the member's status becomes `removed` (never hard-deleted)
 **And** they disappear from `listSelectableMembers` but remain in `getMembers` for history
+
+**Given** a removed member
+**When** a manager adds that person again
+**Then** the Add player sheet offers removed members whose name matches, and choosing one sets the same member row back to active (AD-6); no second member is created, and their earlier sets and ratings stay attached to them
 
 **Given** a member who is not a manager
 **When** they open the Team tab
@@ -455,6 +466,35 @@ So that the app has a memorable icon players want to tap after a session.
 **Given** this story
 **Then** it depends on nothing after Story 1.2 and can run at any time
 
+### Story 1.10: Privacy policy page
+
+As a player,
+I want to read a plain-language privacy policy before I sign up,
+So that I know what the app keeps about me and what happens to it.
+
+**Requirements:** FR1; NFR5, NFR6, NFR9, NFR10; UX-DR17, UX-DR19, UX-DR20
+
+**Acceptance Criteria:**
+
+**Given** anyone, signed in or not
+**When** they open `/privacy`
+**Then** the policy shows as a static page in the app shell (no API call), readable on a phone in light and dark, with a "Last updated" date
+
+**Given** the policy text
+**Then** it states, in the UX voice (short, plain words): what is stored (display name, Google account email or passkey, team memberships, logged sets, hitter ratings, AI discussions, push subscriptions); that it is stored on Cloudflare in the Oceania region; who in a team can see what (matching `permissions-matrix.md`); that AI discussions send only aggregated stats to Cloudflare Workers AI, with teammates' names replaced by labels, and that the provider does not train on them; that users must be 18 or older; how to export data and delete an account, and that deletion anonymises stats rather than removing them; and how to contact the owner
+**And** every statement matches the PRD constraints and the architecture; a statement the app does not yet honour is not included
+
+**Given** the Create account screen and Settings
+**Then** both link to `/privacy`
+
+**Given** the draft policy
+**When** the owner reviews it against the Australian Privacy Principles
+**Then** the review outcome and any follow-up are recorded in `docs/privacy-check.md` [manual check: owner review]
+**And** obligations for users outside Australia stay with the release gate (NFR10) and are not part of this story
+
+**Given** this story
+**Then** it depends on nothing after Story 1.2 and must be done before anyone other than the owner signs up
+
 ## Epic 2: Log a session after training
 
 A setter creates a session, picks who played and their positions, tally-logs every set in under 3 minutes per game set, and reviews each player's logs on session cards and entry lists.
@@ -494,7 +534,7 @@ As a setter,
 I want to pick the players in this session and, optionally, their position today,
 So that logging only shows the right players and positions can change between sessions.
 
-**Requirements:** FR4; UX-DR8; AD-2
+**Requirements:** FR4; UX-DR8; AD-2, AD-18
 
 **Acceptance Criteria:**
 
@@ -512,7 +552,13 @@ So that logging only shows the right players and positions can change between se
 
 **Given** a session's participants
 **When** the setter later edits Who played? and removes a participant
-**Then** the removal is refused with `409 PARTICIPANT_HAS_DATA` if a `ParticipantDataCheck` port reports data for them; until logging exists, the port's default implementation reports no data
+**Then** a participant with no data in this session is removed straight away
+
+**Given** a participant who has sets logged or a rating given in this session
+**When** the setter removes them in Who played?
+**Then** a confirm sheet states what will be deleted (for example "Remove Mia from this session? 14 sets and Mia's rating will be deleted.") with Remove and Cancel; this is how a wrongly picked player is corrected
+**And** on Remove, the participant and their data for this session are deleted in one unit of work (AD-18) using each owning slice's `prepare*` functions, the same way a whole session is deleted (Story 2.6), never by cascade; their data in other sessions is untouched
+**And** until logging (Story 2.3) and ratings (Story 5.1) exist, there is nothing to delete and no confirm sheet shows
 
 ### Story 2.3: Tally-log sets per player
 
@@ -537,7 +583,7 @@ So that I can log a whole game set in under 3 minutes without typing.
 **Then** the API treats the id as an idempotency key and stores the set once
 
 **Given** one user sends logging writes far faster than a person can tap
-**Then** a per-user write limit returns `429` with "Slow down a moment — try again." so one member can't use up the shared daily D1 write allowance [ASSUMPTION: Cloudflare's rate limiting binding is available on the Free plan; otherwise a per-isolate best-effort limit]
+**Then** a per-user write limit returns `429` with "Slow down a moment — try again." so one member can't use up the shared daily D1 write allowance (the Workers Rate Limiting binding, or the direction chosen in Story 1.1)
 
 **Given** a tap fails to save
 **Then** "Couldn't save — check your connection." is shown and nothing is queued for later (UX-DR20 wording applies to every message in these stories)
@@ -547,7 +593,7 @@ So that I can log a whole game set in under 3 minutes without typing.
 
 **Given** the `set_entries` table owned by logging
 **Then** each row stores `team_id`, session, setter member, hitter member, set type, pass quality and rating, team-scoped with composite foreign keys
-**And** logging implements the `ParticipantDataCheck` port so a participant with entries can't be removed (Story 2.2)
+**And** logging exposes `prepareDeleteEntriesForParticipant(scope, sessionId, memberId)`, and removing a participant (Story 2.2) now confirms with the set count and deletes their entries for that session in the same unit of work
 **And** only the session's setter can write its entries
 
 **Given** accessibility needs (UX-DR21)
@@ -772,7 +818,7 @@ So that I see my own stats without anyone retyping my name.
 
 **Given** a valid invite link
 **When** it is opened without signing in
-**Then** `GET /api/invites/:token/preview` (protected by Cloudflare Turnstile and the rate-limiting rule; Turnstile is also added to team creation in this story) shows "You're joining <team>" with the member's name pre-filled, and sets an httpOnly `invite` cookie
+**Then** `GET /api/invites/:token/preview` (protected by Cloudflare Turnstile and, per IP address, by the Workers Rate Limiting binding; Turnstile is also added to team creation in this story) shows "You're joining <team>" with the member's name pre-filled, and sets an httpOnly `invite` cookie
 **And** the preview reveals only the team name and that member's name, nothing else about the team
 
 **Given** the person signs in with Google or a passkey (new or existing account) with all consents recorded
@@ -864,6 +910,10 @@ So that a captain or helper can follow every setter's progress.
 **When** they open Team stats from the Team tab
 **Then** they choose any setter in the team and see that setter's full trend and grid, with every hitter's row (diaryAccess `full`)
 
+**Given** a member with team-wide view looking at a setter in Team stats
+**Then** they also see that setter's session cards and can open any saved session read-only, with every player's counts (diaryAccess `full`)
+**And** Fix and delete are never offered to them, and the API refuses any write to a session that isn't their own (Stories 2.3 and 2.6)
+
 **Given** a member without team-wide view
 **Then** the Team stats entry is hidden, not shown disabled, and the API refuses team-wide queries
 
@@ -880,7 +930,7 @@ As a hitter,
 I want a card for each session I played in, where I can rate how comfortable the sets were,
 So that my setter gets my honest feedback right after the game.
 
-**Requirements:** FR6; NFR4, NFR11; UX-DR10, UX-DR11; AD-9
+**Requirements:** FR6; NFR4, NFR11; UX-DR10, UX-DR11, UX-DR19; AD-9
 
 **Acceptance Criteria:**
 
@@ -904,8 +954,12 @@ So that my setter gets my honest feedback right after the game.
 **Given** a member who isn't a participant, or is the session's setter
 **Then** they get no card, and the API refuses a rating from them
 
+**Given** the Team switcher sheet (Story 4.3, UX-DR19)
+**Then** each team shows how many sessions are waiting for the user's rating there, counted from the same `GET /api/me/ratings/pending` list, and shows no count when there are none
+
 **Given** the ratings slice
 **Then** it exposes `prepareDeleteRatingsForSession(scope, sessionId)`, and deleting a session (Story 2.6) now also deletes its ratings in the same unit of work (AD-18)
+**And** it exposes `prepareDeleteRatingForParticipant(scope, sessionId, memberId)`, and removing a participant (Story 2.2) now names the rating in its confirm sheet and deletes it in the same unit of work
 
 ### Story 5.2: Rating lock and the setter's view of ratings
 
@@ -960,7 +1014,7 @@ As a hitter,
 I want my Home tab to show the quality of the sets I've received over time,
 So that I can see whether my setters' sets to me are improving.
 
-**Requirements:** FR9; NFR3; UX-DR3, UX-DR12; AD-17
+**Requirements:** FR9, FR11; NFR3; UX-DR3, UX-DR12; AD-5, AD-17
 
 **Acceptance Criteria:**
 
@@ -973,6 +1027,11 @@ So that I can see whether my setters' sets to me are improving.
 
 **Given** a member who is both setter and hitter
 **Then** they see Home in addition to the setter tabs (UX-DR3)
+
+**Given** a member with team-wide view in Team stats (Story 4.5)
+**When** they pick any hitter in the team
+**Then** they see that hitter's received-set chart, from the same query with `canSeeHitter` applied inside it (FR11)
+**And** a member without team-wide view asking for another hitter's chart gets nothing
 
 ### Story 5.5: Setters tab with each setter's trend and my own row
 
@@ -1099,8 +1158,9 @@ So that I can remember what I decided to work on.
 **Given** anyone other than the owner, including team managers and team-wide view holders
 **Then** they can't list or open the discussion, and the API refuses
 
-**Given** a setter leaves a team
-**Then** their discussions for that team are deleted
+**Given** a setter leaves a team, or a manager removes them from it
+**Then** their discussions for that team are deleted in the same unit of work as the member change (AD-18), through a `prepareDeleteConversationsForMember(scope, memberId)` function the ai slice exposes
+**And** their discussions in other teams are untouched
 
 **Given** the ai slice
 **Then** it exposes `prepareDeleteConversationsForUser(userId)` for the account-deletion unit of work (AD-18)

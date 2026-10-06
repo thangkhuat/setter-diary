@@ -1,3 +1,4 @@
 # Team override: all planning documents (PRD, UX, architecture, ADRs, RFCs) live together.
 [modules.bmm]
 planning_artifacts = "{output_folder}/planning-artifacts"
+implementation_artifacts = "{output_folder}/implementation-artifacts"

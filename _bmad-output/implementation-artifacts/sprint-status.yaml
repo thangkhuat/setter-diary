@@ -1,0 +1,92 @@
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - ready-for-dev: Story file created, ready for development
+#   - in-progress: Developer actively working on implementation
+#   - review: Implementation complete, ready for review
+#   - done: Story completed
+
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - done: Retrospective has been completed
+
+# Action Item Status:
+#   - open: Committed during a retrospective, not yet addressed
+#   - in-progress: Actively being worked on
+#   - done: Completed
+
+# WORKFLOW NOTES:
+# ===============
+# - Epic transitions to 'in-progress' automatically when its first story starts (via build's sprint sync)
+# - Stories can be worked in parallel if team capacity allows
+# - Developer typically creates the next story after the previous one is 'done' to incorporate learnings
+# - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
+# - Retrospective appends its action items to action_items; the status view surfaces open ones
+generated: 10-06-2026 10:56
+last_updated: 10-06-2026 11:04
+project: setter-diary
+project_key: NOKEY
+tracking_system: file-system
+story_location: _bmad-output/implementation-artifacts
+development_status:
+  epic-1: backlog
+  1-1-deployable-app-from-the-starter-template: backlog
+  1-2-app-shell-design-tokens-and-installable-pwa: backlog
+  1-3-sign-in-with-google: backlog
+  1-4-sign-in-with-a-passkey: backlog
+  1-5-create-a-team: backlog
+  1-6-privacy-rules-who-can-see-what: backlog
+  1-7-add-teammates-to-the-roster: backlog
+  1-8-edit-the-team-s-set-types: backlog
+  1-9-logo-designed-with-an-ai-agent: backlog
+  1-10-privacy-policy-page: backlog
+  epic-1-retrospective: optional
+
+  epic-2: backlog
+  2-1-create-a-session: backlog
+  2-2-choose-who-played-and-their-positions: backlog
+  2-3-tally-log-sets-per-player: backlog
+  2-4-adjust-counts-with-the-selected-cell-bar: backlog
+  2-5-session-cards-with-every-player-s-logs: backlog
+  2-6-review-a-saved-session-fix-counts-or-delete-it: backlog
+  epic-2-retrospective: optional
+
+  epic-3: backlog
+  3-1-weekly-consistency-trend: backlog
+  3-2-hitter-set-type-grid-with-before-now: backlog
+  3-3-run-the-field-trial-and-review: backlog
+  epic-3-retrospective: optional
+
+  epic-4: backlog
+  4-1-invite-a-teammate-with-a-link: backlog
+  4-2-join-a-team-from-an-invite-link: backlog
+  4-3-switch-between-my-teams-or-leave-one: backlog
+  4-4-set-roles-and-managers: backlog
+  4-5-team-wide-view-and-team-stats: backlog
+  epic-4-retrospective: optional
+
+  epic-5: backlog
+  5-1-rate-a-session-from-a-to-rate-card: backlog
+  5-2-rating-lock-and-the-setter-s-view-of-ratings: backlog
+  5-3-notify-hitters-to-rate: backlog
+  5-4-hitter-home-with-my-received-set-progress: backlog
+  5-5-setters-tab-with-each-setter-s-trend-and-my-own-row: backlog
+  epic-5-retrospective: optional
+
+  epic-6: backlog
+  6-1-choose-the-ai-model-with-a-bake-off: backlog
+  6-2-start-an-ai-discussion-about-my-stats: backlog
+  6-3-daily-limits-and-graceful-fallback: backlog
+  6-4-past-discussions-kept-private: backlog
+  epic-6-retrospective: optional
+
+  epic-7: backlog
+  7-1-export-my-data-as-csv: backlog
+  7-2-delete-my-account: backlog
+  epic-7-retrospective: optional
