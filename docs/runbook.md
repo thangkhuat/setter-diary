@@ -4,10 +4,10 @@ How to deploy, roll back, restore and rotate secrets for Setter Diary. Everythin
 
 | What | Where |
 | --- | --- |
-| Production app | `https://setter-diary.setter-diary.workers.dev` |
-| Worker | `setter-diary` |
+| Production app | `https://app.setter-diary.workers.dev` |
+| Worker | `app` (`setter-diary` in the address is the Cloudflare account's subdomain) |
 | Database | D1 `setter-diary`, Oceania (`--location=oc`), bound as `DB` |
-| PR previews | Worker and D1 both named `setter-diary-pr-<PR number>` |
+| PR previews | Worker `app-pr-<PR number>`, D1 `setter-diary-pr-<PR number>` |
 | Pipelines | `.github/workflows/ci.yml`, `preview-cleanup.yml`, `backup.yml` |
 
 Commands below use `npx wrangler`. Run `npx wrangler login` first on a new machine.
@@ -39,21 +39,21 @@ To deploy by hand (only if CI is unavailable):
 npm ci
 npm run db:migrate   # applies pending migrations to production
 npm run deploy       # builds and deploys
-npm run smoke -- https://setter-diary.setter-diary.workers.dev
+npm run smoke -- https://app.setter-diary.workers.dev
 ```
 
 Migrations are expand/contract: add in one deploy, remove in a later one, so the previous version of the code keeps working against the new schema.
 
 ## Pull-request previews
 
-Each pull request from this repository gets its own Worker and its own D1, both named `setter-diary-pr-<N>`, with the URL posted as a PR comment. Closing the PR deletes both. Previews never share production's Worker, secrets or data.
+Each pull request from this repository gets its own Worker (`app-pr-<N>`, at `https://app-pr-<N>.setter-diary.workers.dev`) and its own D1 (`setter-diary-pr-<N>`), with the URL posted as a PR comment. Closing the PR deletes both. Previews never share production's Worker, secrets or data.
 
 A preview's database lives as long as its pull request and is only ever migrated forward. If you regenerate a migration on the branch, close and reopen the pull request to get a fresh database.
 
 The Free plan allows 10 D1 databases per account, so at most 9 pull requests can have a preview at once. If a cleanup run failed, delete leftovers by hand:
 
 ```sh
-npx wrangler delete setter-diary-pr-<N> --force
+npx wrangler delete app-pr-<N> --force
 npx wrangler d1 delete setter-diary-pr-<N>
 ```
 

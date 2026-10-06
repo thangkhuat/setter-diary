@@ -27,7 +27,7 @@ describe("wrangler.jsonc", () => {
 	});
 
 	it("binds the production D1 with the migrations folder", () => {
-		expect(wrangler.name).toBe("setter-diary");
+		expect(wrangler.name).toBe("app");
 		expect(wrangler.d1_databases).toEqual([
 			expect.objectContaining({
 				binding: "DB",

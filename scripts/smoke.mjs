@@ -27,12 +27,31 @@ function expectEqual(actual, expected, what) {
 	}
 }
 
-// A fresh deployment can take a minute or two to answer on workers.dev.
-async function fetchWithRetry(path, attempts = 18) {
+const get = (path) => fetch(`${baseUrl}${path}`, { signal: AbortSignal.timeout(15000) });
+
+// A brand-new workers.dev address takes up to a minute or two to go live. Until then
+// it refuses connections or serves Cloudflare's own 404 page, so wait for the app's
+// health route to answer before checking anything.
+async function waitUntilLive(attempts = 24) {
+	let last = "no response";
+	for (let attempt = 0; attempt < attempts; attempt++) {
+		try {
+			const res = await get("/api/health");
+			if (res.status === 200) return;
+			last = `HTTP ${res.status}`;
+		} catch (error) {
+			last = error instanceof Error ? error.message : String(error);
+		}
+		await new Promise((resolve) => setTimeout(resolve, 5000));
+	}
+	throw new Error(`${baseUrl} did not go live (${last})`);
+}
+
+async function fetchWithRetry(path, attempts = 3) {
 	let lastError;
 	for (let attempt = 0; attempt < attempts; attempt++) {
 		try {
-			const res = await fetch(`${baseUrl}${path}`, { signal: AbortSignal.timeout(15000) });
+			const res = await get(path);
 			if (res.status < 500) return res;
 			lastError = new Error(`HTTP ${res.status}`);
 		} catch (error) {
@@ -42,6 +61,8 @@ async function fetchWithRetry(path, attempts = 18) {
 	}
 	throw lastError;
 }
+
+await check("the app goes live", () => waitUntilLive());
 
 await check("GET /api/health returns 200 with the app version", async () => {
 	const res = await fetchWithRetry("/api/health");

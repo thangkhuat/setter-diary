@@ -1,12 +1,13 @@
-// Writes wrangler.preview.jsonc for one pull request: its own Worker name and its
-// own D1, so a preview never shares production's Worker, secrets or data (AD-19).
+// Writes wrangler.preview.jsonc for one pull request: its own Worker (app-pr-<N>)
+// and its own D1 (setter-diary-pr-<N>), so a preview never shares production's Worker, secrets or data (AD-19).
 // Usage: node scripts/preview-config.mjs <pr-number> <d1-database-id>
 import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { parse, printParseErrorCode } from "jsonc-parser";
 import { isMain } from "./is-main.mjs";
 
-export const previewName = (prNumber) => `setter-diary-pr-${prNumber}`;
+export const previewWorkerName = (prNumber) => `app-pr-${prNumber}`;
+export const previewDatabaseName = (prNumber) => `setter-diary-pr-${prNumber}`;
 
 /**
  * Settings a preview may copy from production as they are. A new top-level key in
@@ -51,12 +52,13 @@ export function previewConfig(production, prNumber, databaseId) {
 	if (databases.length !== 1 || databases[0].binding !== "DB") {
 		throw new Error("Expected exactly one D1 binding named DB in wrangler.jsonc.");
 	}
-	const name = previewName(prNumber);
 	return {
 		...production,
-		name,
+		name: previewWorkerName(prNumber),
 		vars: { ...production.vars, ENV: "preview" },
-		d1_databases: [{ ...databases[0], database_name: name, database_id: databaseId }],
+		d1_databases: [
+			{ ...databases[0], database_name: previewDatabaseName(prNumber), database_id: databaseId },
+		],
 	};
 }
 
