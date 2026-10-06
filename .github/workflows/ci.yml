@@ -1,0 +1,172 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash # bash with pipefail, so a failed command in a pipe fails the step
+
+jobs:
+  checks:
+    name: Checks
+    runs-on: ubuntu-latest
+    # Only the checks are cancelled by a newer push; a preview or production deploy
+    # that has started always finishes.
+    concurrency:
+      group: checks-${{ github.ref }}
+      cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # the journal check compares against origin/main
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Worker types match wrangler.jsonc
+        run: npx wrangler types --check
+      - name: Type-check
+        run: npm run typecheck
+      - name: Lint
+        run: npm run lint
+      - name: Test (core and Workers pool)
+        run: npm test
+      - name: Boundary check
+        run: npm run boundaries
+      - name: Boundary check must fail on the broken fixtures
+        run: npm run boundaries:fixture
+      - name: Migration journal is linear against main
+        run: npm run journal:check -- origin/main
+      - name: Build
+        run: npm run build
+
+  preview:
+    name: Preview
+    needs: checks
+    # Pull requests from forks get no secrets, so they get no preview.
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    # Shares its group with preview-cleanup.yml, so the two never run at the same time.
+    concurrency:
+      group: preview-${{ github.event.pull_request.number }}
+      cancel-in-progress: false
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      GH_TOKEN: ${{ github.token }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+    steps:
+      # The PR may have been closed while the checks ran; cleanup has then already
+      # happened and a preview created now would never be deleted.
+      - name: Stop if the pull request is no longer open
+        id: pr
+        run: |
+          state="$(gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json state --jq .state)"
+          echo "state=$state" >> "$GITHUB_OUTPUT"
+          if [ "$state" != "OPEN" ]; then
+            echo "::notice::Pull request is $state; skipping the preview."
+          fi
+      - uses: actions/checkout@v7
+        if: steps.pr.outputs.state == 'OPEN'
+      - uses: actions/setup-node@v7
+        if: steps.pr.outputs.state == 'OPEN'
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+        if: steps.pr.outputs.state == 'OPEN'
+      - name: Create the preview D1 if it does not exist
+        if: steps.pr.outputs.state == 'OPEN'
+        id: d1
+        run: |
+          name="setter-diary-pr-${PR_NUMBER}"
+          id="$(npx wrangler d1 list --json | node scripts/d1-id.mjs "$name")"
+          if [ -z "$id" ]; then
+            npx wrangler d1 create "$name" --location=oc
+            id="$(npx wrangler d1 list --json | node scripts/d1-id.mjs "$name")"
+          fi
+          if [ -z "$id" ]; then
+            echo "Could not find or create D1 database $name" >&2
+            exit 1
+          fi
+          echo "id=$id" >> "$GITHUB_OUTPUT"
+      - name: Write the preview config
+        if: steps.pr.outputs.state == 'OPEN'
+        run: node scripts/preview-config.mjs "$PR_NUMBER" "${{ steps.d1.outputs.id }}"
+      - name: Migrate the preview D1
+        if: steps.pr.outputs.state == 'OPEN'
+        run: npx wrangler d1 migrations apply DB --remote --config wrangler.preview.jsonc
+      - name: Seed the preview D1
+        if: steps.pr.outputs.state == 'OPEN'
+        run: npx wrangler d1 execute DB --remote --yes --file scripts/seed.sql --config wrangler.preview.jsonc
+      - name: Build
+        if: steps.pr.outputs.state == 'OPEN'
+        run: npm run build
+      - name: Deploy the preview Worker
+        if: steps.pr.outputs.state == 'OPEN'
+        id: deploy
+        run: |
+          npx wrangler deploy --config wrangler.preview.jsonc | tee deploy.log
+          url="$(grep -o 'https://[^ ]*\.workers\.dev' deploy.log | head -n 1 || true)"
+          if [ -z "$url" ]; then
+            echo "Could not read the preview URL from the deploy output" >&2
+            exit 1
+          fi
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+      - name: Smoke-test the preview
+        if: steps.pr.outputs.state == 'OPEN'
+        run: npm run smoke -- "${{ steps.deploy.outputs.url }}"
+      - name: Comment the preview URL
+        if: steps.pr.outputs.state == 'OPEN'
+        env:
+          PREVIEW_URL: ${{ steps.deploy.outputs.url }}
+        run: |
+          body="Preview: ${PREVIEW_URL} (own D1 \`setter-diary-pr-${PR_NUMBER}\`, deleted when this PR closes)"
+          gh pr comment "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --edit-last --create-if-none --body "$body"
+
+  deploy:
+    name: Deploy production
+    needs: checks
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      # Build first: a build failure must not leave the schema ahead of the code.
+      - name: Build
+        run: npm run build
+      - name: Migrate the production D1
+        run: npm run db:migrate
+      - name: Deploy the Worker
+        id: deploy
+        run: |
+          npx wrangler deploy | tee deploy.log
+          url="$(grep -o 'https://[^ ]*\.workers\.dev' deploy.log | head -n 1 || true)"
+          if [ -z "$url" ]; then
+            echo "Could not read the production URL from the deploy output" >&2
+            exit 1
+          fi
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+      # If this fails the new version is still live: see "Roll back a bad deploy" in docs/runbook.md.
+      - name: Smoke-test production
+        run: npm run smoke -- "${{ steps.deploy.outputs.url }}"
