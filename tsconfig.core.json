@@ -1,0 +1,12 @@
+{
+	// Core is type-checked on its own with no ambient types, so Workers, DOM or Node
+	// globals (Env, D1Database, fetch, process…) cannot leak into src/core/ without an
+	// import that the boundary check would catch (AD-1).
+	"extends": "./tsconfig.node.json",
+	"compilerOptions": {
+		"tsBuildInfoFile": "./node_modules/.tmp/tsconfig.core.tsbuildinfo",
+		"lib": ["ES2023"],
+		"types": []
+	},
+	"include": ["src/core"]
+}

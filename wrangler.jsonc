@@ -1,0 +1,30 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "setter-diary",
+	"main": "./worker/index.ts",
+	// Newest date the pinned test runtime (@cloudflare/vitest-pool-workers 0.22) supports,
+	// so tests and production run with the same behaviour.
+	"compatibility_date": "2026-08-22",
+	"compatibility_flags": ["nodejs_compat"],
+	"observability": {
+		"enabled": true
+	},
+	"upload_source_maps": true,
+	"assets": {
+		"directory": "./dist/client",
+		"not_found_handling": "single-page-application",
+		// Screen loads are served from static assets; only /api/* reaches the Worker (AD-3).
+		"run_worker_first": ["/api/*"]
+	},
+	"vars": {
+		"ENV": "production"
+	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "setter-diary",
+			"database_id": "49bd82dc-aee7-4a07-8e09-0bc304e26d70",
+			"migrations_dir": "src/adapters/db/d1/migrations"
+		}
+	]
+}
