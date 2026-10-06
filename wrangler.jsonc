@@ -1,6 +1,7 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "setter-diary",
+	// The Worker name is the first part of the address: app.setter-diary.workers.dev
+	"name": "app",
 	"main": "./worker/index.ts",
 	// Newest date the pinned test runtime (@cloudflare/vitest-pool-workers 0.22) supports,
 	// so tests and production run with the same behaviour.

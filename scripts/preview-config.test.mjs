@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { parseJsonc, previewConfig } from "./preview-config.mjs";
 
 const production = {
-	name: "setter-diary",
+	name: "app",
 	vars: { ENV: "production" },
 	assets: { run_worker_first: ["/api/*"] },
 	d1_databases: [
@@ -20,7 +20,7 @@ describe("previewConfig", () => {
 	it("gives the preview its own Worker name, D1 and ENV", () => {
 		const config = previewConfig(production, "12", previewId);
 
-		expect(config.name).toBe("setter-diary-pr-12");
+		expect(config.name).toBe("app-pr-12");
 		expect(config.vars.ENV).toBe("preview");
 		expect(config.d1_databases).toEqual([
 			{
@@ -36,7 +36,7 @@ describe("previewConfig", () => {
 		const config = previewConfig(production, "12", previewId);
 
 		expect(config.assets).toEqual(production.assets);
-		expect(production.name).toBe("setter-diary");
+		expect(production.name).toBe("app");
 		expect(production.d1_databases[0].database_id).toBe("11111111-1111-1111-1111-111111111111");
 	});
 
