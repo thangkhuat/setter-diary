@@ -1,3 +1,6 @@
 # Claude Code: personal settings and machine-specific skill links
 .claude/settings.local.json
 .claude/skills/
+
+# BMad: rendered workflow snapshots (regenerated on every run)
+_bmad/render/
